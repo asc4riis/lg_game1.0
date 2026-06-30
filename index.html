@@ -1,0 +1,3049 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Aide au Narrateur — Loups-Garous</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & VARIABLES ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #e8dfc8;
+  --ink-dim:   #9a8f7a;
+  --ink-faint: #4a4338;
+  --bg:        #0d0b08;
+  --bg2:       #141209;
+  --bg3:       #1c1812;
+  --bg4:       #242018;
+  --surface:   #1e1a14;
+  --border:    #2e2820;
+  --border2:   #3d3628;
+
+  --wolf:    #c0392b;
+  --wolf2:   #8b1a10;
+  --village: #2e7d52;
+  --village2:#1a5236;
+  --solo:    #7b4fa6;
+  --solo2:   #4a2d6e;
+  --neutral: #8b7355;
+  --indef:   #5a6e7a;
+
+  --gold:    #c9a84c;
+  --gold2:   #8a6a20;
+  --danger:  #c0392b;
+  --success: #27ae60;
+
+  --ff-title: 'Cinzel Decorative', serif;
+  --ff-body:  'Cormorant Garamond', serif;
+  --ff-mono:  'Source Code Pro', monospace;
+
+  --radius: 8px;
+  --radius-lg: 14px;
+  --transition: 0.2s ease;
+}
+
+html { font-size: 16px; }
+body {
+  font-family: var(--ff-body);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* ── BACKGROUND TEXTURE ────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(180, 60, 20, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(100, 50, 150, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ────────────────────────────────────────────────────── */
+#app {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 0 80px;
+}
+
+/* ── HEADER ────────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 32px 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+header h1 {
+  font-family: var(--ff-title);
+  font-size: 1.3rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+}
+header p {
+  font-size: 0.85rem;
+  color: var(--ink-dim);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ── NAVIGATION PHASES ─────────────────────────────────────────── */
+#phase-nav {
+  display: flex;
+  padding: 0 16px;
+  gap: 6px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#phase-nav::-webkit-scrollbar { display: none; }
+.phase-dot {
+  flex: 1;
+  min-width: 60px;
+  text-align: center;
+  font-family: var(--ff-mono);
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  padding: 6px 4px;
+  border-bottom: 2px solid var(--border);
+  transition: var(--transition);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.phase-dot.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.phase-dot.done {
+  color: var(--ink-dim);
+  border-bottom-color: var(--border2);
+}
+
+/* ── SECTIONS ──────────────────────────────────────────────────── */
+.section {
+  display: none;
+  padding: 0 16px;
+  animation: fadeIn 0.3s ease;
+}
+.section.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── CARDS ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-family: var(--ff-title);
+  font-size: 0.8rem;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* ── BUTTONS ───────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-family: var(--ff-body);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: var(--transition);
+  text-align: center;
+  line-height: 1.2;
+}
+.btn-primary {
+  background: var(--gold2);
+  color: var(--ink);
+  border: 1px solid var(--gold);
+}
+.btn-primary:hover { background: var(--gold); color: var(--bg); }
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-dim);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { border-color: var(--ink-dim); color: var(--ink); }
+.btn-danger {
+  background: transparent;
+  color: var(--wolf);
+  border: 1px solid var(--wolf2);
+}
+.btn-danger:hover { background: var(--wolf2); }
+.btn-full { width: 100%; }
+.btn-sm { padding: 6px 12px; font-size: 0.9rem; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── INPUTS ────────────────────────────────────────────────────── */
+input[type=text], input[type=number] {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--ff-body);
+  font-size: 1rem;
+  padding: 10px 14px;
+  outline: none;
+  transition: var(--transition);
+}
+input[type=text]:focus, input[type=number]:focus {
+  border-color: var(--gold2);
+}
+input[type=text]::placeholder { color: var(--ink-faint); }
+
+/* ── PLAYERS LIST ──────────────────────────────────────────────── */
+.player-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+  user-select: none;
+}
+.player-item.dragging {
+  opacity: 0.35;
+}
+.player-item.drag-over {
+  border-color: var(--gold2);
+  background: var(--bg4);
+}
+.drag-handle {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5px;
+  padding: 4px 6px 4px 2px;
+  cursor: grab;
+  flex-shrink: 0;
+  opacity: 0.4;
+  touch-action: none;
+}
+.drag-handle:hover { opacity: 0.8; }
+.drag-handle:active { cursor: grabbing; opacity: 1; }
+.drag-handle span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: var(--ink-dim);
+  border-radius: 1px;
+}
+.player-num {
+  font-family: var(--ff-mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  width: 20px;
+  flex-shrink: 0;
+}
+.player-name { flex: 1; font-size: 1.05rem; }
+.btn-remove-player {
+  background: transparent;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 6px;
+  border-radius: var(--radius);
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.btn-remove-player:hover { color: var(--wolf); background: rgba(192,57,43,0.1); }
+.player-role-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-family: var(--ff-mono);
+  letter-spacing: 0.04em;
+}
+.camp-village  { background: var(--village2); color: #7ecfa0; }
+.camp-loups    { background: var(--wolf2);    color: #f08080; }
+.camp-solitaire{ background: var(--solo2);    color: #c9a0f0; }
+.camp-neutre   { background: #3a3020;         color: #c9a84c; }
+.camp-indefini { background: #1e2a32;         color: #90b0c0; }
+
+/* ── ROLE IMAGE GRID ───────────────────────────────────────────── */
+.role-img-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+@media (min-width: 460px) {
+  .role-img-grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (min-width: 550px) {
+  .role-img-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
+.role-img-card {
+  position: relative;
+  aspect-ratio: 5/7;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.15s, transform 0.15s;
+  background: var(--bg4);
+}
+.role-img-card:hover { transform: translateY(-2px); }
+.role-img-card.selected { border-color: var(--gold); }
+.role-img-card.dimmed { opacity: 0.35; pointer-events: none; }
+.role-img-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.2s;
+}
+.role-img-card:hover img { filter: brightness(0.35); }
+.role-img-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 5px;
+  pointer-events: none;
+}
+.role-img-card:hover .role-img-overlay { opacity: 1; }
+.role-img-name {
+  color: var(--gold);
+  font-family: var(--ff-title);
+  font-size: 0.6rem;
+  line-height: 1.3;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0,0,0,1);
+}
+.role-img-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 15px;
+  height: 15px;
+  background: rgba(0,0,0,0.65);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: var(--gold);
+  pointer-events: none;
+}
+.role-img-warn {
+  position: absolute;
+  bottom: 2px;
+  left: 3px;
+  font-size: 0.6rem;
+  color: var(--wolf);
+  text-shadow: 0 0 4px #000;
+  pointer-events: none;
+}
+.role-img-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--ink-dim);
+  text-align: center;
+  padding: 4px;
+  line-height: 1.2;
+}
+
+/* ── SELECTED STRIP ────────────────────────────────────────────── */
+.selected-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 0 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+  min-height: 68px;
+  align-items: flex-end;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.selected-strip::-webkit-scrollbar { height: 3px; }
+.selected-strip::-webkit-scrollbar-track { background: transparent; }
+.selected-strip::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.strip-card {
+  flex-shrink: 0;
+  width: 40px;
+  aspect-ratio: 5/7;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--gold2);
+  background: var(--bg4);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.strip-card:hover { opacity: 0.7; transform: scale(0.95); }
+.strip-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.strip-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 0.82rem;
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* ── PRESET BUTTONS ────────────────────────────────────────────── */
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.preset-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  color: var(--ink);
+}
+.preset-btn:hover { border-color: var(--border2); }
+.preset-btn.active { border-color: var(--gold2); background: var(--bg4); }
+.preset-name {
+  font-family: var(--ff-title);
+  font-size: 0.75rem;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 4px;
+}
+.preset-desc {
+  font-size: 0.78rem;
+  color: var(--ink-dim);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* ── BALANCE METER ─────────────────────────────────────────────── */
+.balance-bar-bg {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.balance-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+.balance-stats {
+  display: flex;
+  gap: 12px;
+  font-family: var(--ff-mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+}
+.balance-stat span { color: var(--ink); }
+
+/* ── NIGHT STEP ────────────────────────────────────────────────── */
+.night-step {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.night-step-num {
+  font-family: var(--ff-mono);
+  font-size: 0.7rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.night-step-role {
+  font-family: var(--ff-title);
+  font-size: 1rem;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.night-step-condition {
+  font-size: 0.8rem;
+  color: var(--solo);
+  font-style: italic;
+  margin-bottom: 10px;
+}
+.night-step-instruction {
+  font-size: 1rem;
+  color: var(--ink-dim);
+  font-style: italic;
+  line-height: 1.5;
+  border-left: 2px solid var(--border2);
+  padding-left: 12px;
+  margin-bottom: 14px;
+}
+.night-step-instruction em {
+  color: var(--ink);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── DEATH PANEL ───────────────────────────────────────────────── */
+.death-panel {
+  background: #1a0a08;
+  border: 1px solid var(--wolf2);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-top: 12px;
+}
+.death-panel h4 {
+  font-family: var(--ff-title);
+  font-size: 0.75rem;
+  color: var(--wolf);
+  margin-bottom: 10px;
+  letter-spacing: 0.06em;
+}
+
+/* ── PLAYER SELECT ─────────────────────────────────────────────── */
+.player-select-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.player-select-btn {
+  padding: 6px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  font-family: var(--ff-body);
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+.player-select-btn:hover { border-color: var(--border2); color: var(--ink); }
+.player-select-btn.selected {
+  background: var(--wolf2);
+  border-color: var(--wolf);
+  color: var(--ink);
+}
+.player-select-btn.dead { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
+
+/* ── ROLE REVEAL ───────────────────────────────────────────────── */
+.role-reveal {
+  text-align: center;
+  padding: 30px 20px;
+}
+.role-reveal-name {
+  font-family: var(--ff-title);
+  font-size: 1.6rem;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.role-reveal-camp { font-size: 1rem; color: var(--ink-dim); margin-bottom: 16px; }
+.role-reveal-power {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--ink-dim);
+  line-height: 1.6;
+  max-width: 340px;
+  margin: 0 auto 20px;
+}
+
+/* ── GAME BOARD ────────────────────────────────────────────────── */
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.board-night {
+  font-family: var(--ff-title);
+  font-size: 0.9rem;
+  color: var(--gold);
+}
+.board-counts {
+  font-family: var(--ff-mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  display: flex;
+  gap: 12px;
+}
+
+/* ── TOAST ─────────────────────────────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 100;
+  white-space: nowrap;
+  max-width: 90vw;
+  text-align: center;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── BOTTOM NAV ────────────────────────────────────────────────── */
+#bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 50;
+}
+.nav-btn {
+  flex: 1;
+  padding: 12px 6px;
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font-family: var(--ff-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: var(--transition);
+}
+.nav-btn svg { width: 18px; height: 18px; stroke-width: 1.5; }
+.nav-btn.active { color: var(--gold); }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── LOG ───────────────────────────────────────────────────────── */
+.log-entry {
+  font-family: var(--ff-mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.log-entry:last-child { border-bottom: none; }
+.log-entry .log-night { color: var(--gold); }
+
+/* ── DIVIDER ───────────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+/* ── MISC ──────────────────────────────────────────────────────── */
+.count-badge {
+  display: inline-block;
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-family: var(--ff-mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  margin-left: 6px;
+}
+.warning-text {
+  font-size: 0.85rem;
+  color: #c9a84c;
+  font-style: italic;
+  margin-top: 6px;
+}
+.filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.filter-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--ink-dim);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--ff-mono);
+}
+.filter-chip.active { border-color: var(--gold2); color: var(--gold); }
+
+/* ── RESPONSIVE ────────────────────────────────────────────────── */
+@media (min-width: 480px) {
+  header h1 { font-size: 1.6rem; }
+  .role-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <h1>Aide au Narrateur</h1>
+    <p>Loups-Garous de Thiercelieux</p>
+  </header>
+
+  <div id="phase-nav">
+    <div class="phase-dot active" data-phase="setup">Joueurs</div>
+    <div class="phase-dot" data-phase="roles">Rôles</div>
+    <div class="phase-dot" data-phase="attribution">Attribution</div>
+    <div class="phase-dot" data-phase="game">Partie</div>
+  </div>
+
+  <!-- ── PHASE 1 : JOUEURS ──────────────────────────────────────── -->
+  <div class="section active" id="section-setup">
+    <div class="card">
+      <div class="card-title">Ajouter des joueurs</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="player-input" placeholder="Prénom du joueur..." maxlength="24">
+        <button class="btn btn-primary" onclick="addPlayerUI()" style="white-space:nowrap;">Ajouter</button>
+      </div>
+    </div>
+
+    <div id="players-list"></div>
+
+    <div id="min-players-hint" style="display:none;text-align:center;font-family:var(--ff-mono);font-size:0.72rem;color:var(--ink-faint);letter-spacing:0.08em;margin-bottom:6px;">
+      MIN. 5 JOUEURS
+    </div>
+    <button class="btn btn-primary btn-full" onclick="goToRoles()" id="btn-to-roles" disabled>
+      Choisir les rôles →
+    </button>
+  </div>
+
+  <!-- ── PHASE 2 : RÔLES ────────────────────────────────────────── -->
+  <div class="section" id="section-roles">
+
+    <div class="card">
+      <div class="card-title">Preset</div>
+      <div id="preset-grid" style="display:flex;gap:8px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Rôles sélectionnés <span class="count-badge" id="role-count">0 / 0</span></span>
+        <button id="btn-clear-roles" onclick="clearAllRoles()" title="Retirer tous les rôles"
+                style="background:transparent;border:none;cursor:pointer;color:var(--wolf);
+                       font-size:1.15rem;padding:2px 5px;line-height:1;opacity:0.55;
+                       transition:opacity 0.15s;" aria-label="Vider la sélection"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'">✕</button>
+      </div>
+      <!-- Strip des rôles sélectionnés (au-dessus des filtres) -->
+      <div id="selected-roles-strip" class="selected-strip">
+        <span class="strip-empty">Aucun rôle sélectionné…</span>
+      </div>
+      <!-- Filtres (sans Maison) -->
+      <div class="filter-row">
+        <div class="filter-chip active" onclick="toggleFilter(this,'all')">Tous</div>
+        <div class="filter-chip" onclick="toggleFilter(this,'village')">Village</div>
+        <div class="filter-chip" onclick="toggleFilter(this,'loups')">Loups</div>
+        <div class="filter-chip" onclick="toggleFilter(this,'solitaire')">Solitaires</div>
+        <div class="filter-chip" onclick="toggleFilter(this,'neutre')">Neutres</div>
+      </div>
+      <!-- Grille de toutes les cartes -->
+      <div class="role-img-grid" id="role-grid"></div>
+    </div>
+
+    <div class="card" id="balance-card">
+      <div class="card-title">Équilibre</div>
+      <div class="balance-bar-bg"><div class="balance-bar-fill" id="balance-bar" style="width:50%"></div></div>
+      <div class="balance-stats">
+        <div>Loups : <span id="bal-wolves">0</span></div>
+        <div>Village : <span id="bal-village">0</span></div>
+        <div>Solitaires : <span id="bal-solo">0</span></div>
+        <div>Score : <span id="bal-ratio">—</span></div>
+      </div>
+      <div id="balance-remarks" style="margin-top:8px;"></div>
+      <button class="btn btn-primary btn-full" onclick="autoBalanceFill()" style="margin-top:14px;">
+        ⚖ Équilibrage automatique
+      </button>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="goToAttribution()" id="btn-to-attr" disabled>
+      Attribuer les rôles →
+    </button>
+  </div>
+
+  <!-- ── PHASE 3 : ATTRIBUTION ──────────────────────────────────── -->
+  <div class="section" id="section-attribution">
+    <div class="card">
+      <div class="card-title">Attribution secrète</div>
+      <p style="color:var(--ink-dim);font-style:italic;font-size:0.95rem;margin-bottom:16px;">
+        Chaque joueur passe son tour. Tapez sur votre nom, mémorisez votre rôle, puis passez l'appareil.
+      </p>
+      <div id="attribution-list"></div>
+    </div>
+
+    <div id="role-reveal-panel" style="display:none;">
+      <div class="role-reveal" id="role-reveal-content"></div>
+      <button class="btn btn-ghost btn-full" onclick="hideReveal()">Cacher & passer</button>
+    </div>
+
+    <button class="btn btn-ghost btn-full" onclick="skipAllReveal()" id="btn-skip-all" style="margin-top:8px;">
+      Passer tous →
+    </button>
+    <button class="btn btn-primary btn-full" onclick="startGame()" id="btn-start-game" style="display:none;margin-top:8px;">
+      Commencer la partie →
+    </button>
+  </div>
+
+  <!-- ── PHASE 4 : PARTIE ───────────────────────────────────────── -->
+  <div class="section" id="section-game">
+
+    <div class="board-header">
+      <div class="board-night" id="board-phase-label">Journée 0</div>
+      <div class="board-counts">
+        <span>Vivants : <b id="board-alive">0</b></span>
+        <span>Loups : <b id="board-wolves">0</b></span>
+      </div>
+    </div>
+
+    <!-- Sous-vues de la phase jeu -->
+    <div id="game-day" style="display:none;">
+      <div class="card">
+        <div class="card-title">Vote du village</div>
+        <p style="color:var(--ink-dim);font-style:italic;font-size:0.9rem;margin-bottom:12px;">Quel joueur est éliminé aujourd'hui ?</p>
+        <div class="player-select-grid" id="vote-players"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn btn-danger" id="btn-vote-confirm" onclick="confirmVote()" disabled>Éliminer</button>
+          <button class="btn btn-ghost" onclick="startNightUI()">Passer à la nuit →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="game-night" style="display:none;">
+      <div id="night-step-container"></div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-ghost" onclick="prevNightStep()" id="btn-prev-step">← Précédent</button>
+        <button class="btn btn-primary" style="flex:1" onclick="nextNightStep()" id="btn-next-step">Suivant →</button>
+      </div>
+      <div class="card" style="margin-top:16px;" id="night-deaths-card">
+        <div class="card-title">Morts cette nuit</div>
+        <div id="night-deaths-list" style="color:var(--ink-dim);font-style:italic;font-size:0.9rem;">Aucune mort pour l'instant.</div>
+        <button class="btn btn-primary btn-full" onclick="endNightUI()" id="btn-end-night" style="margin-top:12px;display:none;">
+          Lever le soleil →
+        </button>
+      </div>
+    </div>
+
+    <div id="game-victory" style="display:none;">
+      <div style="text-align:center;padding:40px 20px;">
+        <div style="font-family:var(--ff-title);font-size:2rem;color:var(--gold);margin-bottom:12px;">Fin de partie</div>
+        <div id="victory-message" style="font-size:1.1rem;font-style:italic;color:var(--ink-dim);margin-bottom:24px;"></div>
+        <button class="btn btn-primary" onclick="restartGame()">Nouvelle partie</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Journal</div>
+      <div id="game-log" style="max-height:200px;overflow-y:auto;"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-title">Joueurs</div>
+      <div id="game-players-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHASSEUR -->
+<div id="chasseur-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);
+     z-index:200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--wolf);border-radius:var(--radius-lg);
+              padding:24px;max-width:380px;width:100%;text-align:center;">
+    <div style="font-family:var(--ff-title);color:var(--wolf);font-size:1.05rem;margin-bottom:6px;">
+      🏹 Le Chasseur tire !
+    </div>
+    <div style="color:var(--ink-dim);font-style:italic;font-size:0.9rem;margin-bottom:18px;">
+      En tombant, il emporte un joueur dans sa mort.
+    </div>
+    <div class="player-select-grid" id="chasseur-targets"></div>
+    <button class="btn btn-ghost btn-full" onclick="confirmChasseur(null)"
+            style="margin-top:14px;font-size:0.85rem;color:var(--ink-faint);">
+      Ne tire pas (perd son tir)
+    </button>
+  </div>
+</div>
+
+<!-- MODAL LOUP AMNÉSIQUE (réveil spontané) -->
+<div id="loup-amnesique-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);
+     z-index:200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--wolf2);border-radius:var(--radius-lg);
+              padding:24px;max-width:400px;width:100%;text-align:center;">
+    <div style="font-family:var(--ff-title);color:var(--wolf);font-size:1rem;margin-bottom:6px;">
+      ⚡ Réveil du Loup Amnésique !
+    </div>
+    <div style="color:var(--ink-dim);font-style:italic;font-size:0.88rem;margin-bottom:6px;">
+      Les loups l'avaient désigné — il se réveille et rejoint leurs rangs.
+    </div>
+    <div style="color:var(--ink-dim);font-size:0.88rem;margin-bottom:4px;">
+      Le narrateur annonce : <em>"Le Loup Amnésique est de retour !"</em>
+    </div>
+    <div style="color:var(--ink-dim);font-size:0.88rem;margin-bottom:18px;">
+      Tous les loups restent éveillés. Il <strong>doit</strong> en éliminer un pour rejoindre la meute.
+    </div>
+    <div class="player-select-grid" id="loup-amnesique-targets"></div>
+  </div>
+</div>
+
+<!-- MODAL FAUCHEUSE — vote majorité -->
+<div id="faucheuse-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);
+     z-index:200;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+              padding:28px 24px;max-width:360px;width:100%;text-align:center;">
+    <div style="font-size:1.5rem;margin-bottom:10px;">💀</div>
+    <div style="font-weight:700;font-size:1.05rem;margin-bottom:8px;">La Faucheuse</div>
+    <div style="color:var(--ink-dim);font-size:0.9rem;margin-bottom:22px;">
+      A-t-elle voté <strong>avec la majorité</strong> aujourd'hui ?
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" onclick="faucheuseVoteMajorite(false)">Non — pouvoir conservé</button>
+      <button class="btn btn-danger" onclick="faucheuseVoteMajorite(true)">Oui — pouvoir perdu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL QUITTER PARTIE -->
+<div id="quit-game-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);
+     z-index:300;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);
+              padding:28px 24px;max-width:340px;width:100%;text-align:center;">
+    <div style="font-size:1.5rem;margin-bottom:10px;">⚠️</div>
+    <div style="font-weight:700;font-size:1.05rem;margin-bottom:8px;">Quitter la partie ?</div>
+    <div style="color:var(--ink-dim);font-size:0.88rem;margin-bottom:22px;">
+      La partie en cours sera perdue. Voulez-vous vraiment retourner à l'écran des rôles ?
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" onclick="closeQuitModal()">Annuler</button>
+      <button class="btn btn-danger" onclick="confirmQuitGame()">Quitter la partie</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+  <button class="nav-btn active" onclick="showSection('setup')" id="nav-setup">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Joueurs
+  </button>
+  <button class="nav-btn" onclick="navToRoles()" id="nav-roles" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Rôles
+  </button>
+  <button class="nav-btn" onclick="showSection('attribution')" id="nav-attribution" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Attribution
+  </button>
+  <button class="nav-btn" onclick="showSection('game')" id="nav-game" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Partie
+  </button>
+</nav>
+
+<script src="./roles.js"></script>
+<script src="./presets.js"></script>
+<script>
+// ── DONNÉES CHARGÉES DEPUIS roles.js ET presets.js ───────────────
+
+// ── ÉTAT ──────────────────────────────────────────────────────────
+const state = {
+  phase: 'setup',
+  players: [],
+  selectedRoles: [],   // ids des rôles choisis
+  assignedRoles: {},   // { playerId: roleId }
+  revealedPlayers: new Set(),
+  currentPreset: 'equilibre',
+  roleFilter: 'all',
+  nightNumber: 0,
+  nightSteps: [],
+  currentStep: 0,
+  nightActions: {},
+  selectedVoteTarget: null,
+  nightDeaths: [],
+  gameLog: [],
+  infectes: [],   // joueurs infectés par l'Infect Père des Loups (gardent leur rôle)
+  // Faucheuse
+  faucheusePouvoirPerdu: false,
+  faucheuseUsed: false,
+  amoureux: [],
+  loupAmnesiaqueId: null,
+  loupAmnesiaqueRevealed: false,
+  loupNoirUsed: false,
+  ancienLoupUsed: false,
+  grandMechantActif: true,
+  hypnoUsages: 0,
+  envoutes: [],
+  parieurTokens: {},
+  gardeCorpsLastProtected: null,
+  protecteurLastProtected: null,
+  activeEffects: {},   // { playerId: [effects] }
+  // Sorcière
+  sorciereLifeUsed:  false,
+  sorciereDeathUsed: false,
+  // Enfant Sauvage
+  enfantSauvageModel:     null,
+  enfantSauvageConverted: false,
+  // Chien-Loup
+  chienLoupCamp: null,
+  // Ancien
+  ancienPouvoirsDesactives: false,
+  // Renard
+  renardPouvoirPerdu: false,
+  // Chasseur
+  chasseurPending:  false,
+  chasseurCallback: null,
+  // Chevalier à l'épée rouillée
+  chevalierInfectedId: null,
+  // Loup Amnésique
+  loupAmnesiaqueEmergency: false,
+  loupAmnesiaqueCallback: null,
+};
+
+// ── UTILITAIRES ───────────────────────────────────────────────────
+function toast(msg, duration = 2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function campColor(camp) {
+  const map = { village:'camp-village', loups:'camp-loups', solitaire:'camp-solitaire', neutre:'camp-neutre', indefini:'camp-indefini' };
+  return map[camp] || 'camp-neutre';
+}
+
+function campLabel(camp) {
+  const map = { village:'Village', loups:'Loups', solitaire:'Solitaire', neutre:'Neutre', indefini:'Indéfini' };
+  return map[camp] || camp;
+}
+
+function pluralRole(id, count) {
+  // retourne les ids dupliqués pour villageois
+  return Array(count).fill(id);
+}
+
+function getAlivePlayers() {
+  return state.players.filter(p => p.alive);
+}
+
+function addLog(msg, type = 'info') {
+  state.gameLog.unshift({ msg, type, night: state.nightNumber });
+  renderLog();
+}
+
+// ── JOUEURS ───────────────────────────────────────────────────────
+window.addPlayerUI = function() {
+  const input = document.getElementById('player-input');
+  const name = input.value.trim();
+  if (!name) return;
+  if (state.players.length >= 30) { toast('Maximum 30 joueurs.'); return; }
+
+  const id = `p${Date.now()}`;
+  state.players.push({ id, name, role: null, alive: true });
+  state.activeEffects[id] = [];
+  state.parieurTokens[id] = 0;
+  input.value = '';
+  input.focus();
+  renderPlayers();
+};
+
+window.removePlayerUI = function(id) {
+  state.players = state.players.filter(p => p.id !== id);
+  renderPlayers();
+};
+
+function renderPlayers() {
+  const list = document.getElementById('players-list');
+  const count = state.players.length;
+  list.innerHTML = state.players.map((p) => `
+    <div class="player-item" data-id="${p.id}">
+      <div class="drag-handle" title="Glisser pour réordonner">
+        <span></span><span></span><span></span>
+      </div>
+      <span class="player-name">${p.name}</span>
+      <button class="btn-remove-player" onclick="removePlayerUI('${p.id}')" title="Supprimer">✕</button>
+    </div>
+  `).join('');
+
+  // Attacher les événements drag-and-drop sur chaque item
+  list.querySelectorAll('.player-item').forEach(attachDragEvents);
+
+  const enough = count >= 5;
+  document.getElementById('min-players-hint').style.display = enough ? 'none' : 'block';
+  document.getElementById('btn-to-roles').disabled = !enough;
+  document.getElementById('nav-roles').disabled = !enough;
+
+  document.getElementById('player-input').onkeydown = e => { if (e.key === 'Enter') addPlayerUI(); };
+}
+
+// ── DRAG & DROP (souris + tactile) ───────────────────────────────
+let dragSrcId = null;
+let touchDragId = null;
+let touchPlaceholder = null;
+
+function attachDragEvents(el) {
+  const handle = el.querySelector('.drag-handle');
+
+  // ── Souris (HTML5 drag) ───────────────────────────────────────
+  el.setAttribute('draggable', 'false'); // le drag ne se déclenche que depuis le handle
+  handle.addEventListener('mousedown', () => { el.setAttribute('draggable', 'true'); });
+  handle.addEventListener('mouseup',   () => { el.setAttribute('draggable', 'false'); });
+
+  el.addEventListener('dragstart', e => {
+    dragSrcId = el.dataset.id;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  el.addEventListener('dragend', () => {
+    el.classList.remove('dragging');
+    el.setAttribute('draggable', 'false');
+    document.querySelectorAll('.player-item').forEach(i => i.classList.remove('drag-over'));
+  });
+
+  el.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.player-item').forEach(i => i.classList.remove('drag-over'));
+    if (el.dataset.id !== dragSrcId) el.classList.add('drag-over');
+  });
+
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    const targetId = el.dataset.id;
+    if (!dragSrcId || dragSrcId === targetId) return;
+    const srcIdx = state.players.findIndex(p => p.id === dragSrcId);
+    const tgtIdx = state.players.findIndex(p => p.id === targetId);
+    const [moved] = state.players.splice(srcIdx, 1);
+    state.players.splice(tgtIdx, 0, moved);
+    dragSrcId = null;
+    renderPlayers();
+  });
+
+  // ── Tactile ───────────────────────────────────────────────────
+  handle.addEventListener('touchstart', e => {
+    touchDragId = el.dataset.id;
+    el.classList.add('dragging');
+    e.preventDefault();
+  }, { passive: false });
+
+  handle.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.player-item');
+    document.querySelectorAll('.player-item').forEach(i => i.classList.remove('drag-over'));
+    if (target && target.dataset.id !== touchDragId) target.classList.add('drag-over');
+  }, { passive: false });
+
+  handle.addEventListener('touchend', e => {
+    const touch = e.changedTouches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.player-item');
+    el.classList.remove('dragging');
+    document.querySelectorAll('.player-item').forEach(i => i.classList.remove('drag-over'));
+    if (target && target.dataset.id && target.dataset.id !== touchDragId) {
+      const srcIdx = state.players.findIndex(p => p.id === touchDragId);
+      const tgtIdx = state.players.findIndex(p => p.id === target.dataset.id);
+      const [moved] = state.players.splice(srcIdx, 1);
+      state.players.splice(tgtIdx, 0, moved);
+      renderPlayers();
+    }
+    touchDragId = null;
+  });
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────
+window.showSection = function(phase) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`section-${phase}`).classList.add('active');
+  document.querySelectorAll('.phase-dot').forEach(d => {
+    d.classList.remove('active');
+    if (d.dataset.phase === phase) d.classList.add('active');
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`nav-${phase}`).classList.add('active');
+  state.phase = phase;
+};
+
+window.goToRoles = function() {
+  showSection('roles');
+  document.getElementById('nav-roles').disabled = false;
+  renderRoleGrid();
+  renderPresets();
+};
+
+window.goToAttribution = function() {
+  if (state.selectedRoles.length !== state.players.length) {
+    toast(`Sélectionne exactement ${state.players.length} rôles (actuellement ${state.selectedRoles.length}).`);
+    return;
+  }
+  assignRoles();
+  showSection('attribution');
+  document.getElementById('nav-attribution').disabled = false;
+  renderAttribution();
+};
+
+// ── MAPPING IMAGES DES CARTES ─────────────────────────────────────
+const ROLE_IMAGES = {
+  villageois:         'cartes/villageois.webp',
+  voyante:            'cartes/voyante.webp',
+  sorciere:           'cartes/sorciere.webp',
+  chasseur:           'cartes/chasseur.webp',
+  petite_fille:       'cartes/petite_fille.webp',
+  ancien:             'cartes/ancien.webp',
+  soeurs:             'cartes/soeurs.webp',
+  chevalier:          'cartes/chevalier_epee_rouillee.webp',
+  montreur_ours:      "cartes/Montreur_d'Ours.webp",
+  pharmacien:         'cartes/pharmacien.png',
+  hypnotiseur:        'cartes/hypnotiseur.png',
+  evaluateur:         'cartes/evaluateur.png',
+  protecteur:         'cartes/protecteur.png',
+  garde_du_corps:     'cartes/garde_du_corps.png',
+  loup_garou:         'cartes/loup-garou.webp',
+  loup_noir:          'cartes/infect pere loup.webp',
+  grand_mechant_loup: 'cartes/grand mechant loup.webp',
+  faucheuse:          'cartes/faucheuse.webp',
+  loup_blanc:         'cartes/Loup-Garou_Blanc.webp',
+  chien_loup:         'cartes/Chien-Loup.webp',
+  enfant_sauvage:     'cartes/Enfant_Sauvage.webp',
+  ancien_loup:        'cartes/ancien_loup.png',
+  loup_amnesique:     'cartes/loup_amnesique.png',
+  cupidon:            'cartes/cupidon.webp',
+  renard:             'cartes/Renard.webp',
+  ange:               'cartes/ange.webp',
+  joueur_flute:       'cartes/Joueur_de_Fl_te.webp',
+  parieur:            'cartes/parieur.png',
+};
+
+// ── RÔLES ─────────────────────────────────────────────────────────
+window.toggleFilter = function(el, filter) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  state.roleFilter = filter;
+  renderRoleGrid();
+};
+
+const STACKABLE = new Set(['villageois', 'loup_garou']);
+
+function renderRoleGrid() {
+  const grid = document.getElementById('role-grid');
+  const n   = state.players.length;
+  const sel = state.selectedRoles.length;
+  const cap = sel >= n; // quota atteint
+
+  let visible = ROLES.filter(r => r.id !== 'infect_pere');
+  if (state.roleFilter !== 'all') {
+    visible = visible.filter(r => r.camp === state.roleFilter);
+  }
+
+  grid.innerHTML = visible.map(role => {
+    const count  = state.selectedRoles.filter(id => id === role.id).length;
+    const isSelected = count > 0;
+    const img    = ROLE_IMAGES[role.id];
+    const tooFew = role.minPlayers > n;
+
+    // Désactivé si quota plein ET non-stackable (on ne peut pas ajouter)
+    const wouldAdd = !isSelected || STACKABLE.has(role.id) || role.id === 'soeurs';
+    const disabled = cap && wouldAdd;
+
+    // Libellé de compte pour les rôles empilables
+    const countLabel = (STACKABLE.has(role.id) || role.id === 'soeurs') && count > 0
+      ? ` ×${count}` : '';
+
+    return `
+      <div class="role-img-card ${isSelected ? 'selected' : ''} ${disabled ? 'dimmed' : ''}"
+           onclick="toggleRole('${role.id}')">
+        ${img
+          ? `<img src="${img}" alt="${role.name}" loading="lazy">`
+          : `<div class="role-img-fallback">${role.name}</div>`}
+        <div class="role-img-overlay">
+          <span class="role-img-name">${role.name}${countLabel}</span>
+        </div>
+        ${isSelected ? `<div class="role-img-badge">${count > 1 ? count : '✓'}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  renderSelectedStrip();
+  updateRoleCount();
+  updateBalance();
+}
+
+function renderSelectedStrip() {
+  const strip = document.getElementById('selected-roles-strip');
+  if (!strip) return;
+  if (state.selectedRoles.length === 0) {
+    strip.innerHTML = '<span class="strip-empty">Aucun rôle sélectionné…</span>';
+    return;
+  }
+  strip.innerHTML = state.selectedRoles.map(id => {
+    const role = getRoleById(id);
+    const img  = ROLE_IMAGES[id];
+    return `<div class="strip-card" onclick="removeOneRole('${id}')" title="${role?.name || id} — cliquer pour retirer">
+      ${img ? `<img src="${img}" alt="${role?.name || id}">` : `<div class="role-img-fallback" style="font-size:0.5rem;">${role?.name||id}</div>`}
+    </div>`;
+  }).join('');
+}
+
+window.toggleRole = function(id) {
+  const n   = state.players.length;
+  const sel = state.selectedRoles.length;
+
+  if (id === 'soeurs') {
+    const count = state.selectedRoles.filter(r => r === 'soeurs').length;
+    if (count >= 2) {
+      // Retirer la paire entière
+      state.selectedRoles = state.selectedRoles.filter(r => r !== 'soeurs');
+    } else {
+      const need = 2 - count;
+      if (sel + need > n) {
+        toast(`Il faut ${need} emplacement${need > 1 ? 's' : ''} libre${need > 1 ? 's' : ''} pour les Sœurs.`);
+      } else {
+        for (let i = 0; i < need; i++) state.selectedRoles.push('soeurs');
+      }
+    }
+
+  } else if (STACKABLE.has(id)) {
+    // Empilable : chaque clic ajoute une copie jusqu'au quota
+    if (sel < n) {
+      state.selectedRoles.push(id);
+    }
+    // Cliquer sur la carte quand quota atteint ne fait rien (retirer via le strip)
+
+  } else {
+    const idx = state.selectedRoles.indexOf(id);
+    if (idx !== -1) {
+      state.selectedRoles.splice(idx, 1);       // déjà sélectionné → retirer
+    } else if (sel < n) {
+      state.selectedRoles.push(id);             // ajouter
+    } else {
+      toast(`Quota atteint (${n}/${n}). Retire un rôle du strip pour en ajouter un autre.`);
+    }
+  }
+
+  renderRoleGrid();
+};
+
+// Retirer un exemplaire depuis le strip
+window.removeOneRole = function(id) {
+  const idx = state.selectedRoles.indexOf(id);
+  if (idx !== -1) state.selectedRoles.splice(idx, 1);
+  renderRoleGrid();
+};
+
+// Vider toute la sélection
+window.clearAllRoles = function() {
+  if (state.selectedRoles.length === 0) return;
+  state.selectedRoles = [];
+  renderRoleGrid();
+};
+
+function updateRoleCount() {
+  const n = state.players.length;
+  const sel = state.selectedRoles.length;
+  document.getElementById('role-count').textContent = `${sel} / ${n}`;
+  const ok = sel === n;
+  document.getElementById('btn-to-attr').disabled = !ok;
+  document.getElementById('btn-to-attr').textContent = ok
+    ? 'Attribuer les rôles →'
+    : `Attribuer les rôles (${sel}/${n})`;
+}
+
+function updateBalance() {
+  const n = state.players.length;
+  if (n === 0 || state.selectedRoles.length === 0) {
+    const barEl = document.getElementById('balance-bar');
+    if (barEl) {
+      barEl.style.width = '50%';
+      barEl.style.background = 'var(--gold)';
+    }
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('bal-wolves', '0'); set('bal-village', '0'); set('bal-solo', '0'); set('bal-ratio', '—');
+    const rem = document.getElementById('balance-remarks');
+    if (rem) rem.innerHTML = '';
+    return;
+  }
+  const result = evaluateBalance(state.selectedRoles, n);
+  // Barre centrée sur 50% : score 0 = 50%, positif = vers droite, négatif = vers gauche
+  const barW = Math.max(5, Math.min(95, 50 + result.balanceScore * 4));
+  const barColor = result.balanceScore > 1.5 ? 'var(--village)'
+                 : result.balanceScore < -1.5 ? 'var(--wolf)'
+                 : 'var(--gold)';
+  const barEl = document.getElementById('balance-bar');
+  barEl.style.width    = barW + '%';
+  barEl.style.background = barColor;
+  document.getElementById('bal-wolves').textContent  = result.wolves;
+  document.getElementById('bal-village').textContent = result.village;
+  document.getElementById('bal-solo').textContent    = result.solitaires;
+  const sign = result.balanceScore > 0 ? '+' : '';
+  document.getElementById('bal-ratio').textContent   = `${sign}${result.balanceScore} (${result.label})`;
+  document.getElementById('balance-remarks').innerHTML =
+    result.remarks.map(r => `<div class="warning-text">${r}</div>`).join('');
+}
+
+// ── PRESETS ───────────────────────────────────────────────────────
+const ACTIVE_PRESETS = ['equilibre', 'classique', 'bien_contre_mal'];
+
+function renderPresets() {
+  const grid = document.getElementById('preset-grid');
+  grid.innerHTML = ACTIVE_PRESETS.map(id => {
+    const p = PRESETS[id];
+    return `
+      <button class="preset-btn ${state.currentPreset === p.id ? 'active' : ''}"
+              onclick="selectPreset('${p.id}')"
+              style="flex:1;">
+        <span class="preset-name">${p.icon} ${p.name}</span>
+        <span class="preset-desc">${p.description}</span>
+      </button>`;
+  }).join('');
+}
+
+window.selectPreset = function(id) {
+  state.currentPreset = id;
+  renderPresets();
+};
+
+// ── ÉQUILIBRAGE AUTOMATIQUE ────────────────────────────────────────
+function calcBalanceScore(roleIds) {
+  return roleIds.reduce((score, id) => {
+    const r = getRoleById(id);
+    if (!r) return score;
+    const v = r.value || 1.0;
+    if (r.camp === 'village')              return score + v;
+    if (r.camp === 'neutre')               return score + v * 0.5;
+    if (r.camp === 'loups' || r.camp === 'indefini') return score - v;
+    if (r.camp === 'solitaire')            return score - v * 0.5;
+    return score;
+  }, 0);
+}
+
+window.autoBalanceFill = function() {
+  const n = state.players.length;
+  if (n === 0) { toast('Aucun joueur défini.'); return; }
+
+  const isClassique     = state.currentPreset === 'classique';
+  const isBienContreMal = state.currentPreset === 'bien_contre_mal';
+  const TARGET          = 0.5;   // score idéal entre 0 et 1
+
+  // Rôles imposés par l'utilisateur (copie de l'état actuel)
+  const roles = [...state.selectedRoles];
+
+  if (roles.length >= n) {
+    toast('La composition est déjà complète. Retire des rôles pour laisser l\'auto-remplissage agir.');
+    return;
+  }
+
+  // ── Pool de rôles disponibles (filtrage strict par preset) ────────
+  const CLASSIQUE_BASE = new Set(['villageois','cupidon','chasseur','sorciere','voyante','petite_fille','loup_garou']);
+  const pool = ROLES.filter(r => {
+    if (r.id === 'infect_pere') return false;
+    if (r.minPlayers > n)       return false;
+    if (isClassique)            return CLASSIQUE_BASE.has(r.id);
+    if (isBienContreMal)        return r.camp === 'village' || r.camp === 'loups';
+    return true;
+  });
+
+  // Rôles déjà utilisés (mono-exemplaire sauf stackables)
+  const used = new Set(roles.filter(id => !STACKABLE.has(id) && id !== 'soeurs'));
+
+  const isWolf = id => {
+    const r = getRoleById(id); return r && (r.camp === 'loups' || r.camp === 'indefini');
+  };
+  let wolfCount   = roles.filter(isWolf).length;
+  const minWolves = Math.max(1, Math.floor(n / 4));
+  const maxWolves = Math.floor(n / 3);
+
+  const contrib = r => {
+    const v = r.value || 1.0;
+    if (r.camp === 'village')  return v;
+    if (r.camp === 'neutre')   return v * 0.5;
+    if (r.camp === 'loups' || r.camp === 'indefini') return -v;
+    if (r.camp === 'solitaire')return -v * 0.5;
+    return 0;
+  };
+
+  // ── Phase 1 : remplir les loups minimum ─────────────────────────
+  while (wolfCount < minWolves && roles.length < n) {
+    const wolfPool = pool.filter(r =>
+      (r.camp === 'loups' || r.camp === 'indefini') &&
+      (r.id === 'loup_garou' || !used.has(r.id))
+    );
+    if (!wolfPool.length) break;
+    const pick = wolfPool.find(r => r.id === 'loup_garou') || wolfPool[0];
+    roles.push(pick.id);
+    if (!STACKABLE.has(pick.id)) used.add(pick.id);
+    wolfCount++;
+  }
+
+  // ── Phase 2 : remplissage glouton vers score TARGET ──────────────
+  while (roles.length < n) {
+    const current   = calcBalanceScore(roles);
+    const remaining = n - roles.length;
+    let best = null, bestDist = Infinity;
+
+    for (const r of pool) {
+      // Soeurs : gérées en bloc (2 cartes)
+      if (r.id === 'soeurs') {
+        const sc = roles.filter(id => id === 'soeurs').length;
+        if (sc >= 2) continue;
+        if (sc === 0 && remaining < 2) continue;
+        const addCount = sc === 0 ? 2 : 1;
+        const dist = Math.abs((current + contrib(r) * addCount) - TARGET);
+        if (dist < bestDist) { bestDist = dist; best = r; }
+        continue;
+      }
+      // Mono-exemplaire déjà utilisé → skip (sauf stackables)
+      if (!STACKABLE.has(r.id) && used.has(r.id)) continue;
+      // Plafond loups
+      if ((r.camp === 'loups' || r.camp === 'indefini') && wolfCount >= maxWolves) continue;
+      // Neutres : le pool classique/bien_contre_mal les exclut déjà — rien à faire ici
+
+      const dist = Math.abs((current + contrib(r)) - TARGET);
+      // Préférer les rôles à pouvoir sur les villageois à égalité
+      if (dist < bestDist || (dist === bestDist && r.id !== 'villageois')) {
+        bestDist = dist; best = r;
+      }
+    }
+
+    if (!best) {
+      roles.push('villageois'); // fallback ultime
+    } else if (best.id === 'soeurs') {
+      const sc = roles.filter(id => id === 'soeurs').length;
+      roles.push('soeurs');
+      if (sc === 0) roles.push('soeurs'); // toujours en paire
+    } else {
+      roles.push(best.id);
+      if (!STACKABLE.has(best.id)) used.add(best.id);
+      if (best.camp === 'loups' || best.camp === 'indefini') wolfCount++;
+    }
+  }
+
+  // Sanity-check : jamais une soeurs orpheline
+  const sc = roles.filter(id => id === 'soeurs').length;
+  if (sc === 1) roles.push('soeurs'); // compléter la paire si on a de la place
+  // Si on déborde, on enlève l'orpheline
+  while (roles.length > n) {
+    const oi = roles.lastIndexOf('soeurs');
+    if (oi !== -1) roles.splice(oi, 1); else roles.pop();
+  }
+
+  state.selectedRoles = roles;
+  renderRoleGrid();
+
+  const finalScore = calcBalanceScore(roles);
+  const sign = finalScore >= 0 ? '+' : '';
+  toast(`Composition générée — score : ${sign}${Math.round(finalScore * 10) / 10} (${state.currentPreset})`);
+};
+
+// Conservé pour compatibilité mais non affiché
+window.applyPreset = function() {
+  const n = state.players.length;
+  const { roles, warnings } = suggestRoles(n, state.currentPreset, []);
+  state.selectedRoles = roles;
+  warnings.forEach(w => toast(w, 4000));
+  renderRoleGrid();
+  toast(`Preset "${PRESETS[state.currentPreset].name}" appliqué.`);
+};
+
+// ── ATTRIBUTION ───────────────────────────────────────────────────
+function assignRoles() {
+  const shuffled = [...state.selectedRoles].sort(() => Math.random() - 0.5);
+  state.assignedRoles = {};
+  state.players.forEach((p, i) => {
+    state.assignedRoles[p.id] = shuffled[i];
+    if (shuffled[i] === 'loup_amnesique') state.loupAmnesiaqueId = p.id;
+    if (shuffled[i] === 'parieur') state.parieurTokens[p.id] = 2;
+  });
+  state.revealedPlayers = new Set();
+}
+
+function renderAttribution() {
+  const list = document.getElementById('attribution-list');
+  list.innerHTML = state.players.map(p => {
+    const seen = state.revealedPlayers.has(p.id);
+    return `
+    <div class="player-item" onclick="revealRole('${p.id}')" style="cursor:pointer;">
+      <span class="player-num">${seen ? '✓' : '○'}</span>
+      <span class="player-name">${p.name}</span>
+      ${seen
+        ? `<span style="font-size:0.8rem;color:var(--ink-faint);">vu</span>`
+        : `<button class="btn btn-ghost btn-sm" onclick="skipReveal('${p.id}',event)"
+                   style="font-size:0.78rem;padding:3px 10px;color:var(--ink-faint);">Passer</button>
+           <span style="font-size:0.8rem;color:var(--ink-faint);pointer-events:none;">toucher pour voir</span>`
+      }
+    </div>`;
+  }).join('');
+
+  const allSeen = state.revealedPlayers.size === state.players.length;
+  const btn = document.getElementById('btn-start-game');
+  btn.style.display = allSeen ? 'block' : 'none';
+}
+
+window.revealRole = function(playerId) {
+  const roleId = state.assignedRoles[playerId];
+  // Loup Amnésique voit "Villageois"
+  const visibleRoleId = roleId === 'loup_amnesique' ? 'villageois' : roleId;
+  const role = getRoleById(visibleRoleId);
+  const player = state.players.find(p => p.id === playerId);
+
+  const roleImg = ROLE_IMAGES[visibleRoleId];
+  document.getElementById('role-reveal-panel').style.display = 'block';
+  document.getElementById('attribution-list').style.display = 'none';
+  document.getElementById('role-reveal-content').innerHTML = `
+    <div style="font-size:0.85rem;color:var(--ink-faint);margin-bottom:14px;">${player.name}</div>
+    ${roleImg ? `<img src="${roleImg}" alt="${role.name}"
+        style="width:140px;aspect-ratio:5/7;object-fit:cover;border-radius:10px;
+               border:2px solid var(--gold2);box-shadow:0 4px 20px rgba(0,0,0,0.6);
+               display:block;margin:0 auto 18px;">` : ''}
+    <div class="role-reveal-name">${role.name}</div>
+    <div class="role-reveal-camp ${campColor(role.camp)}" style="display:inline-block;padding:3px 12px;border-radius:20px;font-size:0.85rem;margin-bottom:16px;">
+      ${campLabel(role.camp)}
+    </div>
+    <div class="role-reveal-power">${role.power}</div>
+    ${role.notes ? `<div style="font-size:0.8rem;color:var(--ink-faint);font-style:italic;">${role.notes}</div>` : ''}
+  `;
+  state.currentRevealId = playerId;
+};
+
+window.hideReveal = function() {
+  state.revealedPlayers.add(state.currentRevealId);
+  document.getElementById('role-reveal-panel').style.display = 'none';
+  document.getElementById('attribution-list').style.display = 'block';
+  renderAttribution();
+};
+
+window.skipReveal = function(playerId, event) {
+  event.stopPropagation();   // ne pas déclencher revealRole sur le parent
+  state.revealedPlayers.add(playerId);
+  renderAttribution();
+};
+
+window.skipAllReveal = function() {
+  state.players.forEach(p => state.revealedPlayers.add(p.id));
+  renderAttribution();
+};
+
+// ── CHASSEUR ──────────────────────────────────────────────────────
+window.showChasseurModal = function(callback) {
+  state.chasseurCallback = callback || null;
+  const modal   = document.getElementById('chasseur-modal');
+  const targets = document.getElementById('chasseur-targets');
+  targets.innerHTML = getAlivePlayers().map(p => `
+    <button class="player-select-btn" onclick="confirmChasseur('${p.id}')">${p.name}</button>
+  `).join('');
+  modal.style.display = 'flex';
+};
+
+window.confirmChasseur = function(targetId) {
+  document.getElementById('chasseur-modal').style.display = 'none';
+  if (targetId) {
+    const target = state.players.find(p => p.id === targetId);
+    if (target?.alive) {
+      target.alive = false;
+      const role = getRoleById(target.role);
+      addLog(`💀 ${target.name} (${role?.name || '?'}) abattu par le Chasseur.`, 'death');
+      handleDeathEffects(target, 'chasseur');
+    }
+  }
+  const cb = state.chasseurCallback;
+  state.chasseurCallback = null;
+  if (cb) cb();
+  else {
+    renderGamePlayers(); updateBoardCounts();
+    const v = checkVictory(); if (v) showVictory(v);
+  }
+};
+
+// ── LOUP AMNÉSIQUE (réveil spontané) ──────────────────────────────
+window.showLoupAmnesiaqueModal = function(callback) {
+  state.loupAmnesiaqueCallback = callback || null;
+  const targets = document.getElementById('loup-amnesique-targets');
+  const aliveWolves = getAlivePlayers().filter(p =>
+    isWolfPlayer(p) && p.role !== 'loup_amnesique'
+  );
+  targets.innerHTML = aliveWolves.length
+    ? aliveWolves.map(p => `
+        <button class="player-select-btn" onclick="confirmLoupAmnesique('${p.id}')">${p.name}</button>
+      `).join('')
+    : `<div style="color:var(--ink-faint);font-style:italic;font-size:0.9rem;">Aucun loup à éliminer.</div>`;
+  document.getElementById('loup-amnesique-modal').style.display = 'flex';
+};
+
+window.confirmLoupAmnesique = function(targetId) {
+  document.getElementById('loup-amnesique-modal').style.display = 'none';
+  const target = state.players.find(p => p.id === targetId);
+  if (target?.alive) {
+    target.alive = false;
+    const role = getRoleById(target.role);
+    addLog(`⚡ ${target.name} (${role?.name || '?'}) dévoré par le Loup Amnésique en échange de son intégration dans la meute !`, 'death');
+    handleDeathEffects(target, 'loups');
+  }
+  const cb = state.loupAmnesiaqueCallback;
+  state.loupAmnesiaqueCallback = null;
+  if (cb) cb();
+};
+
+// ── DÉMARRAGE ─────────────────────────────────────────────────────
+window.startGame = function() {
+  state.players.forEach(p => {
+    p.role = state.assignedRoles[p.id];
+    p.alive = true;
+  });
+  // Identifier le Loup Amnésique dès le départ (rôle secret)
+  const la = state.players.find(p => p.role === 'loup_amnesique');
+  if (la) state.loupAmnesiaqueId = la.id;
+  state.nightNumber = 0;
+  showSection('game');
+  document.getElementById('nav-game').disabled = false;
+  startNightUI();   // la partie commence toujours par la nuit
+};
+
+// ── JOURNÉE ───────────────────────────────────────────────────────
+function startDayUI(dayNum) {
+  state.nightNumber = dayNum;
+  document.getElementById('board-phase-label').textContent = dayNum === 0 ? 'Mise en place' : `Journée ${dayNum}`;
+  document.getElementById('game-day').style.display = 'block';
+  document.getElementById('game-night').style.display = 'none';
+  document.getElementById('game-victory').style.display = 'none';
+  state.selectedVoteTarget = null;
+  document.getElementById('btn-vote-confirm').disabled = true;
+  renderVotePlayers();
+  renderGamePlayers();
+  updateBoardCounts();
+  if (dayNum > 0) checkMontreurOurs();  // vérification chaque matin (pas la mise en place)
+}
+
+function renderVotePlayers() {
+  const container = document.getElementById('vote-players');
+  container.innerHTML = getAlivePlayers().map(p => `
+    <button class="player-select-btn ${state.selectedVoteTarget === p.id ? 'selected' : ''}"
+            onclick="selectVoteTarget('${p.id}')">
+      ${p.name}
+    </button>
+  `).join('');
+}
+
+window.selectVoteTarget = function(id) {
+  // Garde du Corps ne peut pas être voté
+  const player = state.players.find(p => p.id === id);
+  if (player?.role === 'garde_du_corps') { toast('Le Garde du Corps ne peut pas être éliminé par le vote.'); return; }
+  state.selectedVoteTarget = id;
+  document.getElementById('btn-vote-confirm').disabled = false;
+  renderVotePlayers();
+};
+
+window.confirmVote = function() {
+  if (!state.selectedVoteTarget) return;
+  const player = state.players.find(p => p.id === state.selectedVoteTarget);
+  if (!player) return;
+
+  // Parieur : encaisse l'élimination en dépensant 2 jetons
+  if (player.role === 'parieur' && (state.parieurTokens[player.id] || 0) >= 2) {
+    state.parieurTokens[player.id] -= 2;
+    state.revealedPlayers.add(player.id);
+    addLog(`${player.name} (Parieur) dépense 2 jetons pour encaisser l'élimination — identité révélée !`, 'special');
+    state.selectedVoteTarget = null;
+    document.getElementById('btn-vote-confirm').disabled = true;
+    renderGamePlayers();
+    renderVotePlayers();
+    updateBoardCounts();
+    return;
+  }
+
+  player.alive = false;
+  const role = getRoleById(player.role);
+  addLog(`${player.name} (${role.name}) éliminé par le vote.`, 'vote');
+
+  // Ange : victoire s'il est éliminé par le vote au premier jour
+  if (player.role === 'ange' && state.nightNumber === 1) {
+    showVictory({ winner: 'ange', message: `${player.name} (l'Ange) a été éliminé par le village — il l'emporte !` });
+    return;
+  }
+
+  // Effets spéciaux
+  handleDeathEffects(player, 'vote');
+
+  state.selectedVoteTarget = null;
+  document.getElementById('btn-vote-confirm').disabled = true;
+
+  if (state.chasseurPending) {
+    state.chasseurPending = false;
+    showChasseurModal(() => {
+      renderGamePlayers();
+      renderVotePlayers();
+      updateBoardCounts();
+      const v = checkVictory();
+      if (v) showVictory(v);
+    });
+    return;
+  }
+
+  renderGamePlayers();
+  renderVotePlayers();
+  updateBoardCounts();
+  const victory = checkVictory();
+  if (victory) { showVictory(victory); return; }
+};
+
+window.startNightUI = function() {
+  // Faucheuse : demander si elle a voté avec la majorité (dès la 2ème nuit)
+  const faucheuse = state.players.find(p => p.role === 'faucheuse' && p.alive);
+  if (faucheuse && !state.faucheusePouvoirPerdu && state.nightNumber >= 1) {
+    document.getElementById('faucheuse-modal').style.display = 'flex';
+    return; // la modal appellera doStartNightUI() en callback
+  }
+  doStartNightUI();
+};
+
+window.faucheuseVoteMajorite = function(oui) {
+  document.getElementById('faucheuse-modal').style.display = 'none';
+  if (oui) {
+    state.faucheusePouvoirPerdu = true;
+    addLog('💀 La Faucheuse a voté avec la majorité — son pouvoir est perdu définitivement.', 'special');
+  }
+  doStartNightUI();
+};
+
+function doStartNightUI() {
+  // Chevalier : le loup infecté meurt au crépuscule (transition jour → nuit)
+  if (state.chevalierInfectedId) {
+    const infected = state.players.find(p => p.id === state.chevalierInfectedId);
+    state.chevalierInfectedId = null;
+    if (infected?.alive) {
+      infected.alive = false;
+      const role = getRoleById(infected.role);
+      addLog(`⚔ ${infected.name} (${role?.name || '?'}) succombe à l'infection du Chevalier.`, 'death');
+      handleDeathEffects(infected, 'chevalier');
+      updateBoardCounts();
+      const v = checkVictory();
+      if (v) { showVictory(v); return; }
+    }
+  }
+
+  state.nightNumber++;
+  document.getElementById('board-phase-label').textContent = `Nuit ${state.nightNumber}`;
+  document.getElementById('game-day').style.display = 'none';
+  document.getElementById('game-night').style.display = 'block';
+  state.nightDeaths = [];
+  state.nightActions = {};
+  document.getElementById('night-deaths-list').textContent = 'Aucune mort pour l\'instant.';
+  document.getElementById('btn-end-night').style.display = 'none';
+  buildNightSteps();
+  state.currentStep = 0;
+  renderNightStep();
+  renderGamePlayers();
+  addLog(`Nuit ${state.nightNumber} commence.`, 'night');
+};
+
+// ── NUIT ──────────────────────────────────────────────────────────
+function buildNightSteps() {
+  const aliveRoleIds = getAlivePlayers().map(p => p.role);
+  const order = state.nightNumber === 1 ? NIGHT_ORDER_N1 : NIGHT_ORDER_CLASSIC;
+
+  state.nightSteps = order.filter(roleId => {
+    if (roleId === 'villageois') return false;
+    // Étape loups : active dès qu'un loup (de n'importe quel type) est vivant
+    if (roleId === 'loup_garou') return getAlivePlayers().some(p => isWolfPlayer(p));
+    if (!aliveRoleIds.includes(roleId)) return false;
+    if (roleId === 'loup_amnesique') return false; // se réveille avec les loups, jamais séparément
+    if (roleId === 'loup_blanc' && (state.nightNumber % 2 !== 0 || state.nightNumber < 2)) return false;
+    if (roleId === 'grand_mechant_loup' && !state.grandMechantActif) return false;
+    // Loup Noir : toujours appelé (même si pouvoir épuisé) pour ne pas révéler au village s'il a agi
+    if (roleId === 'hypnotiseur' && state.hypnoUsages >= 2) return false;
+    if (roleId === 'renard' && state.renardPouvoirPerdu) return false;
+    return true;
+  }).map(roleId => {
+    const role = getRoleById(roleId);
+    return {
+      roleId,
+      roleName: role?.name || roleId,
+      camp: role?.camp,
+      instruction: getInstruction(roleId),
+      condition: getCondition(roleId),
+    };
+  });
+}
+
+function getInstruction(roleId) {
+  const alive = getAlivePlayers().map(p => p.name).join(', ');
+  const map = {
+    cupidon:          'Cupidon, ouvre les yeux. Désigne deux joueurs qui tomberont amoureux. Referme les yeux.',
+    enfant_sauvage:   'Enfant Sauvage, ouvre les yeux. Désigne ton modèle parmi les vivants. Referme les yeux.',
+    chien_loup:       'Chien-Loup, ouvre les yeux. Indique-moi ton camp : Village ou Loups ? Referme les yeux.',
+    soeurs:           'Les Sœurs ouvrent les yeux, se reconnaissent mutuellement, et referment les yeux.',
+    ancien_loup:      'Ancien Loup, ouvre les yeux. Utilises-tu ta magie ancestrale cette nuit ? (Lève le pouce ou non.) Referme les yeux.',
+    pharmacien:       'Pharmacien, ouvre les yeux. Désigne un joueur à endormir — il ne pourra pas utiliser son pouvoir cette nuit. Referme les yeux.',
+    voyante:          'Voyante, ouvre les yeux. Désigne un joueur dont tu veux connaître le rôle. (Montre-lui sa carte.) Referme les yeux.',
+    hypnotiseur:      'Hypnotiseur, ouvre les yeux. Désigne un joueur qui ne pourra ni parler ni voter demain. Referme les yeux.',
+    renard:           'Renard, ouvre les yeux. Désigne un groupe de 3 joueurs adjacents. (Indique-lui si au moins l\'un est un loup.) Referme les yeux.',
+    evaluateur:       'Évaluateur, ouvre les yeux. Désigne deux joueurs. (Réponds "même camp" ou "camps différents".) Referme les yeux.',
+    protecteur:       'Protecteur, ouvre les yeux. Désigne un joueur à protéger des attaques physiques. Referme les yeux.',
+    garde_du_corps:   'Garde du Corps, ouvre les yeux. Désigne un joueur à protéger de toutes les attaques. Referme les yeux.',
+    parieur:          'Parieur, ouvre les yeux. Indique-moi ta mise (jetons) et le joueur visé. Referme les yeux.',
+    joueur_flute:     'Joueur de Flûte, ouvre les yeux. Désigne deux joueurs à envoûter. Referme les yeux.',
+    faucheuse:        state.faucheusePouvoirPerdu
+      ? 'Faucheuse, ouvre les yeux. (Pouvoir perdu — tu passes ton tour.) Referme les yeux.'
+      : state.faucheuseUsed
+        ? 'Faucheuse, ouvre les yeux. (Pouvoir déjà utilisé — tu passes ton tour.) Referme les yeux.'
+        : 'Faucheuse, ouvre les yeux. Utilises-tu ton pouvoir d\'élimination cette nuit ? Referme les yeux.',
+    loup_garou:       state.loupAmnesiaqueRevealed
+      ? 'Les Loups-Garous ouvrent les yeux (y compris le Loup Amnésique), se concertent, et désignent leur victime. Refermez les yeux.'
+      : 'Les Loups-Garous ouvrent les yeux, se concertent, et désignent leur victime. Refermez les yeux.',
+    loup_noir:        'Loup Noir, ouvre les yeux. Transformes-tu la victime des loups en loup plutôt que de la dévorer ? Referme les yeux.',
+    grand_mechant_loup: 'Grand Méchant Loup, ouvre les yeux. Tous tes compères sont en vie — désigne ta seconde victime. Referme les yeux.',
+    loup_blanc:       'Loup Blanc, ouvre les yeux. Désigne un loup à dévorer ce soir, ou referme les yeux sans agir.',
+    loup_amnesique:   'Le Loup Amnésique s\'éveille. Ouvre les yeux. Tu rejoins les loups — désigne ta victime. Referme les yeux.',
+    sorciere:         'Sorcière, ouvre les yeux. (Montre-lui qui a été dévoré.) Utilises-tu ta potion de vie ? Ta potion de mort ? Referme les yeux.',
+    petite_fille:     '(Petite Fille — si elle a espionné et a été repérée par un loup, elle est dévorée à la place de la victime désignée.)',
+  };
+  return map[roleId] || `${roleId} — agis.`;
+}
+
+function getCondition(roleId) {
+  const map = {
+    loup_blanc: 'Nuit paire uniquement (nuit ' + state.nightNumber + ')',
+    grand_mechant_loup: 'Conditionnel : tous ses compères doivent être en vie',
+    loup_noir: 'Conditionnel : pouvoir non encore utilisé',
+    hypnotiseur: `Utilisations restantes : ${2 - state.hypnoUsages}`,
+    ancien_loup: 'Conditionnel : si non encore utilisé',
+  };
+  return map[roleId] || null;
+}
+
+function renderNightStep() {
+  const container = document.getElementById('night-step-container');
+  const step = state.nightSteps[state.currentStep];
+
+  if (!step) {
+    // Fin des étapes
+    container.innerHTML = `
+      <div class="night-step">
+        <div class="night-step-num">Fin des réveils</div>
+        <div class="night-step-role">Tous ont agi.</div>
+        <div class="night-step-instruction">Tous le monde dort. Résous les effets et note les morts.</div>
+      </div>
+    `;
+    document.getElementById('btn-end-night').style.display = 'block';
+    document.getElementById('btn-next-step').disabled = true;
+    return;
+  }
+
+  document.getElementById('btn-next-step').disabled = false;
+  document.getElementById('btn-prev-step').disabled = state.currentStep === 0;
+
+  container.innerHTML = `
+    <div class="night-step">
+      ${state.nightActions.ancien_loup?.block && step.camp !== 'loups' && step.roleId !== 'garde_du_corps' ? `
+        <div style="background:#1a1000;border:1px solid var(--wolf2);border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;font-size:0.82rem;color:#e07060;">
+          🐺 L'Ancien Loup a bloqué toutes les actions — ce rôle ne peut pas agir cette nuit.
+        </div>` : ''}
+      ${state.ancienPouvoirsDesactives && step.camp === 'village' && step.roleId !== 'garde_du_corps' ? `
+        <div style="background:#2d1a00;border:1px solid #8b5e00;border-radius:var(--radius);padding:8px 12px;margin-bottom:10px;font-size:0.82rem;color:#d4a020;">
+          ⚠ L'Ancien a été voté — ce rôle villageois n'a plus de pouvoir cette nuit.
+        </div>` : ''}
+      <div class="night-step-num">Étape ${state.currentStep + 1} / ${state.nightSteps.length}</div>
+      <div class="night-step-role">${step.roleName}</div>
+      ${step.condition ? `<div class="night-step-condition">⚡ ${step.condition}</div>` : ''}
+      <div class="night-step-instruction">${step.instruction}</div>
+      ${renderStepActions(step)}
+    </div>
+  `;
+}
+
+function renderStepActions(step) {
+  const ancienBlocked = state.nightActions.ancien_loup?.block === true && step.camp !== 'loups' && step.roleId !== 'garde_du_corps';
+  const inner = _renderStepActionsInner(step);
+  if (!inner) return '';
+  if (ancienBlocked) {
+    return `<div style="opacity:0.22;pointer-events:none;user-select:none;filter:grayscale(0.5);">${inner}</div>`;
+  }
+  return inner;
+}
+
+function _renderStepActionsInner(step) {
+  const roleId = step.roleId;
+
+  // ── Faucheuse ─────────────────────────────────────────────────────
+  if (roleId === 'faucheuse') {
+    const pouvoirActif = !state.faucheusePouvoirPerdu && !state.faucheuseUsed;
+    const target = state.nightActions.faucheuse?.target;
+    const statusStyle = pouvoirActif
+      ? 'background:rgba(180,30,30,0.12);color:var(--wolf);border:1px solid rgba(180,30,30,0.3);'
+      : 'background:var(--bg3);color:var(--ink-faint);border:1px solid var(--border);font-style:italic;';
+    const statusMsg = state.faucheusePouvoirPerdu
+      ? '⚠ Pouvoir perdu — a voté avec la majorité.'
+      : state.faucheuseUsed
+        ? '⚠ Pouvoir déjà utilisé cette partie.'
+        : '💀 Pouvoir actif — peut éliminer un joueur ce soir.';
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.82rem;padding:7px 11px;border-radius:var(--radius);margin-bottom:12px;${statusStyle}">
+          ${statusMsg}
+        </div>
+        ${pouvoirActif ? `
+          <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Cible :</div>
+          <div class="player-select-grid">
+            ${getAlivePlayers().filter(p => p.role !== 'faucheuse').map(p => `
+              <button class="player-select-btn ${target === p.id ? 'selected' : ''}"
+                      onclick="setNightTarget('faucheuse','${p.id}')">${p.name}</button>`).join('')}
+          </div>
+          <div style="margin-top:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="setFaucheusePass()"
+              style="${!target ? 'opacity:0.5;' : ''}">Ne pas agir cette nuit</button>
+          </div>` : ''}
+      </div>`;
+  }
+
+  // ── Sorcière : potions avec UI dédiée ────────────────────────────
+  if (roleId === 'sorciere') {
+    const loupVictimId  = state.nightActions.loup_garou?.target;
+    const loupVictim    = loupVictimId ? state.players.find(p => p.id === loupVictimId) : null;
+    const saved         = state.nightActions.sorciere?.save;
+    const killTgt       = state.nightActions.sorciere?.kill;
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.85rem;color:var(--ink-dim);margin-bottom:10px;">
+          Victime des loups :
+          <strong style="color:${loupVictim ? 'var(--wolf)' : 'var(--ink-faint)'};">
+            ${loupVictim ? loupVictim.name : 'aucune'}
+          </strong>
+        </div>
+        <div style="margin-bottom:12px;">
+          ${!state.sorciereLifeUsed && loupVictim ? `
+            <button class="btn btn-sm" onclick="setSorciereAction('save')" style="
+              background:${saved ? 'var(--village2)' : 'var(--bg3)'};
+              border:1px solid ${saved ? 'var(--village)' : 'var(--border2)'};
+              color:${saved ? '#7ecfa0' : 'var(--ink-dim)'};">
+              🧪 Potion de vie${saved ? ' ✓' : ''}
+            </button>` :
+            `<span style="font-size:0.8rem;color:var(--ink-faint);font-style:italic;">
+              Potion de vie : ${state.sorciereLifeUsed ? 'épuisée' : 'pas de victime'}
+            </span>`}
+        </div>
+        ${!state.sorciereDeathUsed ? `
+          <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">☠ Potion de mort :</div>
+          <div class="player-select-grid">
+            ${getAlivePlayers().map(p => `
+              <button class="player-select-btn ${killTgt === p.id ? 'selected' : ''}"
+                      onclick="setSorciereKill('${p.id}')">${p.name}</button>`).join('')}
+          </div>` :
+          `<span style="font-size:0.8rem;color:var(--ink-faint);font-style:italic;">Potion de mort : épuisée</span>`}
+      </div>`;
+  }
+
+  // ── Chien-Loup : choix du camp (nuit 1 uniquement) ───────────────
+  if (roleId === 'chien_loup') {
+    const cv = state.chienLoupCamp;
+    return `
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-sm" onclick="setChienLoupCamp('village')" style="
+          background:${cv === 'village' ? 'var(--village2)' : 'var(--bg3)'};
+          border:1px solid ${cv === 'village' ? 'var(--village)' : 'var(--border2)'};
+          color:${cv === 'village' ? '#7ecfa0' : 'var(--ink-dim)'};">
+          🏡 Village${cv === 'village' ? ' ✓' : ''}
+        </button>
+        <button class="btn btn-sm" onclick="setChienLoupCamp('loups')" style="
+          background:${cv === 'loups' ? 'var(--wolf2)' : 'var(--bg3)'};
+          border:1px solid ${cv === 'loups' ? 'var(--wolf)' : 'var(--border2)'};
+          color:${cv === 'loups' ? '#f08080' : 'var(--ink-dim)'};">
+          🐺 Loups${cv === 'loups' ? ' ✓' : ''}
+        </button>
+      </div>`;
+  }
+
+  // ── Voyante : révèle le rôle à l'écran du narrateur ─────────────
+  if (roleId === 'voyante') {
+    const target = state.nightActions.voyante?.target;
+    const tp     = target ? state.players.find(p => p.id === target) : null;
+    // Loup Amnésique non révélé → la Voyante le voit comme Villageois
+    const isHiddenAmnesique = tp && tp.role === 'loup_amnesique' && !state.loupAmnesiaqueRevealed;
+    const tr = tp ? getRoleById(isHiddenAmnesique ? 'villageois' : tp.role) : null;
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Joueur à révéler :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().map(p => `
+            <button class="player-select-btn ${target === p.id ? 'selected' : ''}"
+                    onclick="setNightTarget('voyante','${p.id}')">${p.name}</button>`).join('')}
+        </div>
+        ${tp ? `
+          <div style="margin-top:12px;padding:12px;background:var(--bg3);border:1px solid var(--gold2);border-radius:var(--radius);text-align:center;">
+            <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:4px;">${tp.name} est…</div>
+            <div style="font-size:1.1rem;font-weight:600;color:var(--gold);">${tr?.name || tp.role}</div>
+            ${tr?.description ? `<div style="font-size:0.75rem;color:var(--ink-faint);margin-top:3px;font-style:italic;">${tr.description}</div>` : ''}
+          </div>` : ''}
+      </div>`;
+  }
+
+  // ── Loups-Garous : victime + Petite Fille repérée ────────────────
+  if (roleId === 'loup_garou') {
+    const target    = state.nightActions.loup_garou?.target;
+    const pfSpotted = state.nightActions.loup_garou?.petiteFilleSpotted;
+    const pf        = state.players.find(p => p.role === 'petite_fille' && p.alive);
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Victime désignée :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().map(p => `
+            <button class="player-select-btn ${target === p.id ? 'selected' : ''}"
+                    onclick="setNightTarget('loup_garou','${p.id}')">${p.name}</button>`).join('')}
+        </div>
+        ${pf ? `
+          <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+            <button class="btn btn-sm btn-full" onclick="togglePetiteFille()" style="
+              background:${pfSpotted ? '#3a1f5a' : 'var(--bg3)'};
+              border:1px solid ${pfSpotted ? 'var(--solo)' : 'var(--border2)'};
+              color:${pfSpotted ? '#c9a8ff' : 'var(--ink-dim)'};">
+              👀 Petite Fille repérée${pfSpotted ? ' ✓ — dévorée à la place !' : ''}
+            </button>
+          </div>` : ''}
+      </div>`;
+  }
+
+  // ── Renard : groupe de 3 joueurs adjacents (résultat automatique) ──
+  if (roleId === 'renard') {
+    const target = state.nightActions.renard?.target;
+    const result = state.nightActions.renard?.result; // calculé auto dans setNightTarget
+    let group = [];
+    if (target) {
+      const alive = state.players.filter(p => p.alive);
+      const idx   = alive.findIndex(p => p.id === target);
+      if (idx !== -1 && alive.length >= 3) {
+        const n = alive.length;
+        group = [alive[(idx - 1 + n) % n], alive[idx], alive[(idx + 1) % n]];
+      }
+    }
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Joueur central du groupe :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().map(p => `
+            <button class="player-select-btn ${target === p.id ? 'selected' : ''}"
+                    onclick="setNightTarget('renard','${p.id}')">${p.name}</button>`).join('')}
+        </div>
+        ${group.length === 3 ? `
+          <div style="margin-top:10px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);font-size:0.85rem;color:var(--ink-dim);">
+            Groupe sondé : <strong style="color:var(--ink);">${group.map(p => p.name).join(' · ')}</strong>
+          </div>
+          <div style="margin-top:8px;padding:12px;border-radius:var(--radius);text-align:center;font-weight:600;font-size:0.95rem;
+                      background:${result ? '#2a0d0d' : '#0d2a15'};
+                      border:1px solid ${result ? 'var(--wolf)' : 'var(--village)'};
+                      color:${result ? '#f08080' : '#7ecfa0'};">
+            ${result === true  ? '🐺 Oui — au moins un loup dans ce groupe. Réponds "oui" au Renard.' :
+              result === false ? '✓ Non — aucun loup. Réponds "non" au Renard. Son pouvoir est perdu.' :
+              '…'}
+          </div>` : ''}
+      </div>`;
+  }
+
+  // ── Évaluateur : 2 joueurs (résultat automatique) ─────────────────
+  if (roleId === 'evaluateur') {
+    const targets = state.nightActions.evaluateur?.targets || [];
+    const result  = state.nightActions.evaluateur?.result; // true/false/null, calculé auto
+    const names   = targets.map(id => state.players.find(p => p.id === id)?.name || '?');
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Deux joueurs à comparer (${targets.length}/2) :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().map(p => `
+            <button class="player-select-btn ${targets.includes(p.id) ? 'selected' : ''}"
+                    onclick="setEvaluateurTarget('${p.id}')">${p.name}</button>`).join('')}
+        </div>
+        ${targets.length === 2 && result !== null ? `
+          <div style="margin-top:8px;padding:12px;border-radius:var(--radius);text-align:center;font-weight:600;font-size:0.95rem;
+                      background:${result ? '#0d2a15' : '#2a1500'};
+                      border:1px solid ${result ? 'var(--village)' : 'var(--wolf)'};
+                      color:${result ? '#7ecfa0' : '#f08080'};">
+            ${result
+              ? `🤝 <strong>${names[0]}</strong> et <strong>${names[1]}</strong> sont dans le <strong>même camp</strong>.`
+              : `⚔ <strong>${names[0]}</strong> et <strong>${names[1]}</strong> sont dans des <strong>camps différents</strong>.`}
+          </div>` : ''}
+      </div>`;
+  }
+
+  // ── Joueur de Flûte : 2 joueurs à envoûter ───────────────────────
+  if (roleId === 'joueur_flute') {
+    const selected = state.nightActions.joueur_flute?.targets || [];
+    const me = state.players.find(p => p.role === 'joueur_flute');
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">
+          Deux joueurs à envoûter (${selected.length}/2) :
+        </div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().filter(p => p.id !== me?.id).map(p => {
+            const deja = state.envoutes.includes(p.id);
+            return `<button class="player-select-btn ${selected.includes(p.id) ? 'selected' : ''}"
+                            onclick="setJoueurFluteTarget('${p.id}')">
+                      ${p.name}${deja ? ' <span style="color:var(--solo);font-size:0.7rem;">♪</span>' : ''}
+                    </button>`;
+          }).join('')}
+        </div>
+        ${selected.length === 2 ? `
+          <div style="margin-top:6px;font-size:0.8rem;color:var(--ink-faint);">
+            Cibles : ${selected.map(id => state.players.find(p => p.id === id)?.name).join(' & ')}
+          </div>` : ''}
+      </div>`;
+  }
+
+  // ── Parieur : cible + mise en jetons ─────────────────────────────
+  if (roleId === 'parieur') {
+    const pp       = state.players.find(p => p.role === 'parieur' && p.alive);
+    const tokens   = pp ? (state.parieurTokens[pp.id] || 0) : 0;
+    const target   = state.nightActions.parieur?.target;
+    const amount   = state.nightActions.parieur?.amount ?? 1;
+    const tName    = target ? state.players.find(p => p.id === target)?.name : null;
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--gold);margin-bottom:8px;">🪙 Jetons disponibles : <strong>${tokens}</strong></div>
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Parier sur la mort de :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().filter(p => p.role !== 'parieur').map(p => `
+            <button class="player-select-btn ${target === p.id ? 'selected' : ''}"
+                    onclick="setParieurTarget('${p.id}')">${p.name}</button>`).join('')}
+        </div>
+        ${target && tokens > 0 ? `
+          <div style="margin-top:10px;display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);">
+            <span style="font-size:0.8rem;color:var(--ink-faint);">Mise :</span>
+            <button class="btn btn-ghost btn-sm" onclick="setParieurAmount(-1)"
+                    style="width:30px;height:30px;padding:0;font-size:1rem;line-height:1;">−</button>
+            <span style="font-size:1.2rem;font-weight:700;color:var(--gold);min-width:28px;text-align:center;">${amount}</span>
+            <button class="btn btn-ghost btn-sm" onclick="setParieurAmount(1)"
+                    style="width:30px;height:30px;padding:0;font-size:1rem;line-height:1;">+</button>
+            <span style="font-size:0.78rem;color:var(--ink-faint);">jeton(s) sur <strong>${tName}</strong></span>
+          </div>` : target ? `
+          <div style="margin-top:8px;font-size:0.8rem;color:var(--ink-faint);font-style:italic;">Aucun jeton disponible pour miser.</div>` : ''}
+      </div>`;
+  }
+
+  // ── Loup Blanc : ne peut cibler que des loups (excl. lui-même) ────
+  if (roleId === 'loup_blanc') {
+    const me     = state.players.find(p => p.role === 'loup_blanc');
+    const target = state.nightActions.loup_blanc?.target;
+    const wolves = getAlivePlayers().filter(p => isWolfPlayer(p) && p.id !== me?.id);
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Loup à dévorer :</div>
+        ${wolves.length > 0
+          ? `<div class="player-select-grid">
+              ${wolves.map(p => `
+                <button class="player-select-btn ${target === p.id ? 'selected' : ''}"
+                        onclick="setNightTarget('loup_blanc','${p.id}')">${p.name}</button>`).join('')}
+            </div>`
+          : `<div style="color:var(--ink-faint);font-style:italic;font-size:0.9rem;">Aucun autre loup vivant — ne peut pas agir.</div>`}
+        <div style="margin-top:6px;font-size:0.75rem;color:var(--ink-faint);font-style:italic;">
+          La mort de ce loup n'apparaît pas dans le journal.
+        </div>
+      </div>`;
+  }
+
+  // ── Rôles avec sélecteur de cible générique ───────────────────────
+  if (['pharmacien','hypnotiseur','protecteur','garde_du_corps',
+       'grand_mechant_loup',
+       'enfant_sauvage'].includes(roleId)) {
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Victime / Cible :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().map(p => {
+            const isBlocked = (roleId === 'protecteur'    && p.id === state.protecteurLastProtected)
+                           || (roleId === 'garde_du_corps' && p.id === state.gardeCorpsLastProtected);
+            const isSelected = state.nightActions[roleId]?.target === p.id;
+            if (isBlocked) {
+              return `<button class="player-select-btn" disabled
+                style="opacity:0.38;cursor:not-allowed;color:var(--wolf);text-decoration:line-through;"
+                title="Déjà protégé la nuit dernière">${p.name}</button>`;
+            }
+            return `<button class="player-select-btn ${isSelected ? 'selected' : ''}"
+                    onclick="setNightTarget('${roleId}','${p.id}')">${p.name}</button>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  if (roleId === 'cupidon') {
+    return `
+      <div style="margin-top:10px;">
+        <div style="font-size:0.8rem;color:var(--ink-faint);margin-bottom:6px;font-family:var(--ff-mono);">Amoureux (2 joueurs) :</div>
+        <div class="player-select-grid">
+          ${getAlivePlayers().map(p => `
+            <button class="player-select-btn ${(state.nightActions.cupidon?.targets||[]).includes(p.id) ? 'selected' : ''}"
+                    onclick="setCupidonTarget('${p.id}')">${p.name}</button>`).join('')}
+        </div>
+      </div>`;
+  }
+  if (roleId === 'ancien_loup') {
+    if (state.ancienLoupUsed) {
+      return `<div style="margin-top:10px;">
+        <span style="font-size:0.85rem;color:var(--ink-faint);font-style:italic;">
+          Magie ancestrale déjà utilisée — il passe son tour.
+        </span>
+      </div>`;
+    }
+    return `
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-danger btn-sm" onclick="setAncienLoup(true)">Bloquer tous les pouvoirs</button>
+        <button class="btn btn-ghost btn-sm"  onclick="setAncienLoup(false)">Passer</button>
+      </div>`;
+  }
+  if (roleId === 'loup_noir') {
+    if (state.loupNoirUsed) {
+      return `<div style="margin-top:10px;">
+        <span style="font-size:0.85rem;color:var(--ink-faint);font-style:italic;">
+          Pouvoir déjà utilisé — le Loup Noir passe son tour.
+        </span>
+      </div>`;
+    }
+    return `
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-danger btn-sm" onclick="setLoupNoir(true)">Transformer en loup</button>
+        <button class="btn btn-ghost btn-sm"  onclick="setLoupNoir(false)">Dévorer normalement</button>
+      </div>`;
+  }
+  return '';
+}
+
+// Calcule le camp effectif d'un joueur pour l'Évaluateur
+function getEffectiveCamp(p) {
+  // Loup Amnésique non révélé → détecté comme villageois par tous les rôles de détection
+  if (p.role === 'loup_amnesique' && !state.loupAmnesiaqueRevealed) return 'village';
+  if (isWolfPlayer(p)) return 'loups';                  // loups + chien_loup loups + enfant sauvage converti
+  const role = getRoleById(p.role);
+  if (role?.camp === 'solitaire') return p.role;         // chaque solitaire = camp unique
+  if (p.role === 'chien_loup')    return state.chienLoupCamp || 'indefini';
+  if (p.role === 'enfant_sauvage') return 'indefini';   // non converti = indéfini
+  // Village + neutres → même camp
+  if (role?.camp === 'village' || role?.camp === 'neutre') return 'village';
+  return p.role;
+}
+
+window.setNightTarget = function(roleId, playerId) {
+  if (!state.nightActions[roleId]) state.nightActions[roleId] = {};
+  state.nightActions[roleId].target = playerId;
+  // Enregistrer protections
+  if (roleId === 'garde_du_corps') state.gardeCorpsLastProtected = playerId;
+  if (roleId === 'protecteur') state.protecteurLastProtected = playerId;
+  // Renard : calculer automatiquement si le groupe contient un loup
+  if (roleId === 'renard') {
+    const alive = state.players.filter(p => p.alive);
+    const idx   = alive.findIndex(p => p.id === playerId);
+    if (idx !== -1 && alive.length >= 3) {
+      const n     = alive.length;
+      const group = [alive[(idx - 1 + n) % n], alive[idx], alive[(idx + 1) % n]];
+      // Loup Amnésique non révélé = invisible pour le Renard (il croit être villageois)
+      const hasWolf = group.some(p => isWolfPlayer(p) && !(p.role === 'loup_amnesique' && !state.loupAmnesiaqueRevealed));
+      state.nightActions.renard.result = hasWolf;
+      if (!hasWolf && !state.renardPouvoirPerdu) {
+        state.renardPouvoirPerdu = true;
+        addLog('🦊 Le Renard n\'a détecté aucun loup — il perd son pouvoir définitivement.', 'special');
+      }
+    }
+  }
+  renderNightStep();
+};
+
+window.setCupidonTarget = function(id) {
+  if (!state.nightActions.cupidon) state.nightActions.cupidon = { targets: [] };
+  const t = state.nightActions.cupidon.targets;
+  if (t.includes(id)) {
+    t.splice(t.indexOf(id), 1);
+  } else if (t.length < 2) {
+    t.push(id);
+    if (t.length === 2) state.amoureux = [...t];
+  }
+  renderNightStep();
+};
+
+window.setAncienLoup = function(block) {
+  state.nightActions.ancien_loup = { block };
+  if (block) {
+    state.ancienLoupUsed = true;
+    addLog('Ancien Loup active sa magie — pouvoirs bloqués cette nuit.', 'special');
+  }
+  renderNightStep();
+};
+
+window.setFaucheusePass = function() {
+  if (!state.nightActions.faucheuse) state.nightActions.faucheuse = {};
+  state.nightActions.faucheuse.target = null;
+  renderNightStep();
+};
+
+window.setLoupNoir = function(convert) {
+  state.nightActions.loup_noir = { convert };
+  renderNightStep();
+};
+
+window.setSorciereAction = function(action) {
+  if (!state.nightActions.sorciere) state.nightActions.sorciere = {};
+  if (action === 'save') state.nightActions.sorciere.save = !state.nightActions.sorciere.save;
+  renderNightStep();
+};
+window.setSorciereKill = function(playerId) {
+  if (!state.nightActions.sorciere) state.nightActions.sorciere = {};
+  state.nightActions.sorciere.kill = state.nightActions.sorciere.kill === playerId ? null : playerId;
+  renderNightStep();
+};
+
+window.setChienLoupCamp = function(camp) {
+  state.chienLoupCamp = camp;
+  const cl = state.players.find(p => p.role === 'chien_loup');
+  if (cl) addLog(`Chien-Loup (${cl.name}) rejoint le camp : ${camp === 'loups' ? 'Loups 🐺' : 'Village 🏡'}.`, 'special');
+  renderNightStep();
+};
+
+// Petite Fille repérée par les loups
+window.togglePetiteFille = function() {
+  if (!state.nightActions.loup_garou) state.nightActions.loup_garou = {};
+  const pf = state.players.find(p => p.role === 'petite_fille' && p.alive);
+  if (!pf) return;
+  const spotted = state.nightActions.loup_garou.petiteFilleSpotted;
+  if (!spotted) {
+    state.nightActions.loup_garou.petiteFilleSpotted = true;
+    state.nightActions.loup_garou.target = pf.id;   // elle remplace la victime désignée
+    addLog(`👀 La Petite Fille a été repérée — les loups la dévorent à la place.`, 'special');
+  } else {
+    state.nightActions.loup_garou.petiteFilleSpotted = false;
+    state.nightActions.loup_garou.target = null;
+  }
+  renderNightStep();
+};
+
+// Renard : résultat du sondage (loup présent ou non dans le groupe)
+window.setRenardResult = function(hasWolf) {
+  if (!state.nightActions.renard) state.nightActions.renard = {};
+  state.nightActions.renard.result = hasWolf;
+  if (!hasWolf && !state.renardPouvoirPerdu) {
+    state.renardPouvoirPerdu = true;
+    addLog('🦊 Le Renard n\'a détecté aucun loup — il perd son pouvoir définitivement.', 'special');
+  }
+  renderNightStep();
+};
+
+// Évaluateur : sélection des deux joueurs à comparer + résultat auto
+window.setEvaluateurTarget = function(id) {
+  if (!state.nightActions.evaluateur) state.nightActions.evaluateur = { targets: [] };
+  const t = state.nightActions.evaluateur.targets;
+  if (t.includes(id)) {
+    t.splice(t.indexOf(id), 1);
+  } else if (t.length < 2) {
+    t.push(id);
+  }
+  // Calcul automatique quand 2 joueurs sont sélectionnés
+  if (t.length === 2) {
+    const p1 = state.players.find(p => p.id === t[0]);
+    const p2 = state.players.find(p => p.id === t[1]);
+    // Les deux amoureux = même camp (règle spéciale)
+    const bothAmoureux = state.amoureux.length === 2
+      && state.amoureux.includes(t[0]) && state.amoureux.includes(t[1]);
+    state.nightActions.evaluateur.result = bothAmoureux
+      ? true
+      : getEffectiveCamp(p1) === getEffectiveCamp(p2);
+  } else {
+    state.nightActions.evaluateur.result = null;
+  }
+  renderNightStep();
+};
+
+// Joueur de Flûte : sélection des 2 cibles (toggle, max 2)
+window.setJoueurFluteTarget = function(id) {
+  if (!state.nightActions.joueur_flute) state.nightActions.joueur_flute = { targets: [] };
+  const t = state.nightActions.joueur_flute.targets;
+  if (t.includes(id)) {
+    t.splice(t.indexOf(id), 1);
+  } else if (t.length < 2) {
+    t.push(id);
+  }
+  renderNightStep();
+};
+
+// Parieur : cible du pari
+window.setParieurTarget = function(id) {
+  const pp     = state.players.find(p => p.role === 'parieur' && p.alive);
+  const tokens = pp ? (state.parieurTokens[pp.id] || 0) : 0;
+  if (!state.nightActions.parieur) state.nightActions.parieur = { amount: Math.min(1, tokens) };
+  state.nightActions.parieur.target = id;
+  // Clamp la mise au nombre de jetons disponibles
+  state.nightActions.parieur.amount = Math.max(1, Math.min(state.nightActions.parieur.amount || 1, tokens));
+  renderNightStep();
+};
+
+// Parieur : ajuster la mise (+/- 1)
+window.setParieurAmount = function(delta) {
+  if (!state.nightActions.parieur) return;
+  const pp     = state.players.find(p => p.role === 'parieur' && p.alive);
+  const tokens = pp ? (state.parieurTokens[pp.id] || 0) : 0;
+  const cur    = state.nightActions.parieur.amount ?? 1;
+  state.nightActions.parieur.amount = Math.max(1, Math.min(tokens, cur + delta));
+  renderNightStep();
+};
+
+window.nextNightStep = function() {
+  state.currentStep++;
+  renderNightStep();
+};
+
+window.prevNightStep = function() {
+  if (state.currentStep > 0) state.currentStep--;
+  renderNightStep();
+};
+
+window.endNightUI = function() {
+  resolveNight();
+
+  // Loup Amnésique : réveil spontané (cas 2 — les loups l'avaient désigné)
+  if (state.loupAmnesiaqueEmergency) {
+    state.loupAmnesiaqueEmergency = false;
+    showLoupAmnesiaqueModal(() => finishNight());
+    return;
+  }
+
+  finishNight();
+};
+
+function finishNight() {
+  if (state.chasseurPending) {
+    state.chasseurPending = false;
+    showChasseurModal(() => {
+      startDayUI(state.nightNumber);
+      renderNightDeaths();
+      const v = checkVictory(); if (v) showVictory(v);
+    });
+    return;
+  }
+  startDayUI(state.nightNumber);
+  renderNightDeaths();
+  const v = checkVictory(); if (v) showVictory(v);
+}
+
+function resolveNight() {
+  const actions = state.nightActions;
+  const blocked = actions.ancien_loup?.block === true;
+  const deaths = [];
+
+  // Protections actives cette nuit
+  // Le Garde du Corps est immune à tout blocage (Ancien, Ancien Loup) — il conserve TOUJOURS son pouvoir
+  const gardeTarget   = actions.garde_du_corps?.target;
+  const protectTarget = (blocked || state.ancienPouvoirsDesactives) ? null : actions.protecteur?.target;
+
+  // Pharmacien (endort)
+  if (actions.pharmacien?.target && !blocked) {
+    const p = state.players.find(pl => pl.id === actions.pharmacien.target);
+    if (p && !isFullyProtected(p.id, gardeTarget)) {
+      state.activeEffects[p.id] = state.activeEffects[p.id] || [];
+      state.activeEffects[p.id].push('endormi');
+    }
+  }
+
+  // Victimes des loups
+  const loupTarget = actions.loup_garou?.target;
+  if (loupTarget) {
+    // Cas spécial : les loups ont désigné le Loup Amnésique (réveil spontané)
+    const loupTargetPlayer = state.players.find(pl => pl.id === loupTarget);
+    if (loupTargetPlayer?.role === 'loup_amnesique' && !state.loupAmnesiaqueRevealed) {
+      // Il se réveille immédiatement — ne meurt pas, rejoint les loups
+      state.loupAmnesiaqueRevealed = true;
+      state.loupAmnesiaqueId = loupTargetPlayer.id;
+      state.loupAmnesiaqueEmergency = true;
+      addLog(`⚡ ÉVÉNEMENT : Les loups ont désigné le Loup Amnésique (${loupTargetPlayer.name}) ! Il se réveille et peut éliminer un loup de son choix.`, 'special');
+    } else if (actions.loup_noir?.convert) {
+      // Conversion par le Loup Noir — bloquée si le Garde du Corps protège la cible
+      const gdb = state.players.find(pl => pl.role === 'garde_du_corps' && pl.alive);
+      if (gdb && loupTarget === gardeTarget) {
+        // GdC annule la transformation — il survit, Loup Noir perd son pouvoir
+        state.loupNoirUsed = true;
+        const tName = state.players.find(pl => pl.id === loupTarget)?.name || '?';
+        addLog(`${gdb.name} (Garde du Corps) s'interpose — la transformation de ${tName} par le Loup Noir est annulée ! Le Loup Noir perd définitivement son pouvoir.`, 'special');
+      } else {
+        const p = state.players.find(pl => pl.id === loupTarget);
+        if (p) {
+          state.infectes.push(p.id);
+          state.loupNoirUsed = true;
+          const role = getRoleById(p.role);
+          addLog(`${p.name} (${role?.name || p.role}) est infecté par l'Infect Père des Loups — il conserve son rôle mais joue désormais pour les loups !`, 'special');
+        }
+      }
+    } else {
+      applyAttack(loupTarget, 'loups', deaths, gardeTarget, protectTarget, true);
+    }
+  }
+
+  // Loup Noir sans conversion = victime déjà traitée
+  // Grand Méchant Loup
+  if (actions.grand_mechant_loup?.target && state.grandMechantActif) {
+    applyAttack(actions.grand_mechant_loup.target, 'grand_mechant_loup', deaths, gardeTarget, protectTarget, true);
+  }
+
+  // Loup Blanc (mort silencieuse — pas inscrite dans le journal)
+  if (actions.loup_blanc?.target) {
+    const p = state.players.find(pl => pl.id === actions.loup_blanc.target);
+    if (p?.alive) { p.alive = false; deaths.push({ player: p, cause: 'Loup Blanc', silent: true }); }
+  }
+
+  // Sorcière (neutralisée si l'Ancien a été voté)
+  if (!state.ancienPouvoirsDesactives) {
+    if (actions.sorciere?.save && loupTarget) {
+      state.sorciereLifeUsed = true;
+      const p = state.players.find(pl => pl.id === loupTarget);
+      if (p) {
+        p.alive = true;
+        deaths.splice(deaths.findIndex(d => d.player.id === loupTarget), 1);
+        addLog(`Sorcière sauve ${p.name}.`, 'special');
+      }
+    }
+    if (actions.sorciere?.kill) {
+      state.sorciereDeathUsed = true;
+      applyAttack(actions.sorciere.kill, 'sorciere', deaths, gardeTarget, protectTarget, true);
+    }
+  } else if (actions.sorciere?.save || actions.sorciere?.kill) {
+    addLog('🚫 Sorcière : pouvoirs annulés (l\'Ancien a été voté).', 'info');
+  }
+
+  // Faucheuse
+  if (actions.faucheuse?.target && !state.faucheusePouvoirPerdu && !state.faucheuseUsed) {
+    state.faucheuseUsed = true;
+    applyAttack(actions.faucheuse.target, 'faucheuse', deaths, gardeTarget, protectTarget, true);
+  }
+
+  // Enfant Sauvage : enregistrer le modèle choisi (nuit 1)
+  if (state.nightNumber === 1 && actions.enfant_sauvage?.target && !state.enfantSauvageModel) {
+    state.enfantSauvageModel = actions.enfant_sauvage.target;
+    const model = state.players.find(p => p.id === state.enfantSauvageModel);
+    if (model) addLog(`Enfant Sauvage choisit ${model.name} comme modèle.`, 'info');
+  }
+
+  // Hypnotiseur
+  if (actions.hypnotiseur?.target && !blocked) {
+    const p = state.players.find(pl => pl.id === actions.hypnotiseur.target);
+    if (p && !isFullyProtected(p.id, gardeTarget)) {
+      state.activeEffects[p.id] = state.activeEffects[p.id] || [];
+      state.activeEffects[p.id].push('hypnotise');
+      state.hypnoUsages++;
+      addLog(`${p.name} est hypnotisé — muet et sans vote demain.`, 'special');
+    }
+  }
+
+  // Joueur de Flûte
+  if (actions.joueur_flute?.targets && !blocked) {
+    actions.joueur_flute.targets.forEach(id => {
+      if (!state.envoutes.includes(id)) state.envoutes.push(id);
+    });
+  }
+
+  // Amoureux
+  if (state.amoureux.length === 2) {
+    const [a1id, a2id] = state.amoureux;
+    const a1 = state.players.find(p => p.id === a1id);
+    const a2 = state.players.find(p => p.id === a2id);
+    if (a1 && a2) {
+      if (!a1.alive && a2.alive) { a2.alive = false; deaths.push({ player: a2, cause: 'chagrin' }); }
+      if (!a2.alive && a1.alive) { a1.alive = false; deaths.push({ player: a1, cause: 'chagrin' }); }
+    }
+  }
+
+  // Parieur : résolution du pari (pas de revenu passif)
+  const parieurPlayer = state.players.find(p => p.role === 'parieur' && p.alive);
+  if (parieurPlayer) {
+    const betTarget = actions.parieur?.target;
+    const betAmount = actions.parieur?.amount ?? 0;
+    if (betTarget && betAmount > 0) {
+      const targetDied = deaths.some(d => d.player.id === betTarget);
+      const tName = state.players.find(p => p.id === betTarget)?.name || '?';
+      if (targetDied) {
+        state.parieurTokens[parieurPlayer.id] = (state.parieurTokens[parieurPlayer.id] || 0) + betAmount;
+        addLog(`🎲 Pari GAGNÉ ! ${tName} est mort — +${betAmount} = ${state.parieurTokens[parieurPlayer.id]} jeton(s).`, 'special');
+      } else {
+        state.parieurTokens[parieurPlayer.id] = Math.max(0, (state.parieurTokens[parieurPlayer.id] || 0) - betAmount);
+        addLog(`🎲 Pari perdu sur ${tName} — −${betAmount} = ${state.parieurTokens[parieurPlayer.id]} jeton(s).`, 'info');
+      }
+    }
+    // Filet de sécurité : 1 jeton gratuit uniquement s'il tombe à 0
+    if ((state.parieurTokens[parieurPlayer.id] || 0) === 0) {
+      state.parieurTokens[parieurPlayer.id] = 1;
+      addLog(`🎲 Parieur à 0 jeton — 1 jeton de secours accordé.`, 'info');
+    }
+  }
+
+  // Morts → effets spéciaux
+  deaths.forEach(d => handleDeathEffects(d.player, d.cause));
+
+  state.nightDeaths = deaths;
+  deaths.forEach(d => {
+    if (!d.silent) addLog(`${d.player.name} meurt (${d.cause}).`, 'death');
+  });
+
+  // Grand Méchant Loup — vérifier si un compère est mort
+  const aliveWolves = getAlivePlayers().filter(p =>
+    ['loup_garou','loup_noir','grand_mechant_loup','loup_blanc','loup_amnesique'].includes(p.role)
+  );
+  if (aliveWolves.length < state.players.filter(p =>
+    ['loup_garou','loup_noir','grand_mechant_loup','loup_blanc','loup_amnesique'].includes(p.role)
+  ).length) state.grandMechantActif = false;
+
+  // Loup Amnésique
+  checkLoupAmnesique();
+  updateBoardCounts();
+}
+
+function applyAttack(targetId, source, deaths, gardeTarget, protectTarget, isPhysical) {
+  const p = state.players.find(pl => pl.id === targetId);
+  if (!p || !p.alive) return;
+
+  // Garde du Corps intercepte tout
+  if (targetId === gardeTarget) {
+    const gdb = state.players.find(pl => pl.role === 'garde_du_corps' && pl.alive);
+    if (gdb) { gdb.alive = false; deaths.push({ player: gdb, cause: `interception (${source})` }); return; }
+  }
+
+  // Protecteur intercepte les physiques
+  if (isPhysical && targetId === protectTarget) { return; }
+
+  // Parieur survit en dépensant 2 jetons
+  if (p.role === 'parieur' && (state.parieurTokens[p.id] || 0) >= 2) {
+    state.parieurTokens[p.id] -= 2;
+    state.revealedPlayers.add(p.id);
+    addLog(`${p.name} (Parieur) dépense 2 jetons pour encaisser l'attaque — identité révélée !`, 'special');
+    return;
+  }
+
+  // Ancien survit une fois
+  if (p.role === 'ancien' && !p.ancienFirstHit) { p.ancienFirstHit = true; return; }
+
+  p.alive = false;
+  deaths.push({ player: p, cause: source });
+}
+
+function isFullyProtected(id, gardeTarget) {
+  return id === gardeTarget;
+}
+
+// Premier loup vivant à droite du chevalier dans le cercle de placement
+function findFirstWolfToRight(players, startIdx) {
+  const n = players.length;
+  for (let i = 1; i < n; i++) {
+    const candidate = players[(startIdx + i) % n];
+    if (candidate.alive && isWolfPlayer(candidate)) return candidate;
+  }
+  // Fallback : loup aléatoire si personne à droite
+  const wolves = players.filter(p => p.alive && isWolfPlayer(p));
+  return wolves.length ? wolves[Math.floor(Math.random() * wolves.length)] : null;
+}
+
+// Montreur d'Ours : détecte un loup voisin dans le cercle des vivants
+function checkMontreurOurs() {
+  const mo = state.players.find(p => p.role === 'montreur_ours' && p.alive);
+  if (!mo) return;
+  const alive = state.players.filter(p => p.alive);
+  const idx   = alive.findIndex(p => p.id === mo.id);
+  const n     = alive.length;
+  const left  = alive[(idx - 1 + n) % n];
+  const right = alive[(idx + 1) % n];
+  if (isWolfPlayer(left) || isWolfPlayer(right)) {
+    toast('🐻 L\'ours grogne ! Un loup est assis à côté du Montreur d\'Ours.', 5000);
+    addLog('🐻 L\'ours grogne — un voisin du Montreur d\'Ours est un Loup.', 'special');
+  }
+}
+
+function handleDeathEffects(player, cause) {
+  // Enfant Sauvage : son modèle meurt → il bascule côté Loups
+  if (state.enfantSauvageModel === player.id && !state.enfantSauvageConverted) {
+    state.enfantSauvageConverted = true;
+    const es = state.players.find(p => p.role === 'enfant_sauvage' && p.alive);
+    if (es) {
+      es.role = 'loup_garou';
+      addLog(`⚠ ${es.name} (Enfant Sauvage) perd son modèle et rejoint les Loups !`, 'special');
+    }
+  }
+
+  // Chasseur : prépare la sélection interactive de cible (neutralisé si l'Ancien a été voté)
+  if (player.role === 'chasseur') {
+    if (state.ancienPouvoirsDesactives) {
+      addLog(`🏹 ${player.name} (Chasseur) meurt — son pouvoir est annulé (l'Ancien a été voté).`, 'info');
+    } else {
+      state.chasseurPending = true;
+      addLog(`🏹 ${player.name} (Chasseur) meurt et tire une dernière flèche !`, 'special');
+    }
+  }
+
+  // Chevalier à l'épée rouillée : infecte le premier loup vivant à sa droite (neutralisé si l'Ancien a été voté)
+  if (player.role === 'chevalier' && (cause === 'loups' || cause === 'grand_mechant_loup')) {
+    if (state.ancienPouvoirsDesactives) {
+      addLog(`⚔ ${player.name} (Chevalier) meurt — son infection est annulée (l'Ancien a été voté).`, 'info');
+    } else {
+      const chevalierIdx = state.players.indexOf(player);
+      const infected = findFirstWolfToRight(state.players, chevalierIdx);
+      if (infected) {
+        state.chevalierInfectedId = infected.id;
+        addLog(`⚔ Le Chevalier infecte ${infected.name} — il mourra au prochain crépuscule.`, 'special');
+      }
+    }
+  }
+  // Loup Amnésique : mort d'un loup → vérifier réveil
+  if (['loup_garou','loup_noir','grand_mechant_loup','loup_blanc'].includes(player.role)) {
+    checkLoupAmnesique();
+  }
+  // Amoureux
+  if (state.amoureux.includes(player.id)) {
+    const otherId = state.amoureux.find(id => id !== player.id);
+    const other = state.players.find(p => p.id === otherId);
+    if (other?.alive) {
+      other.alive = false;
+      addLog(`${other.name} meurt de chagrin (amoureux).`, 'death');
+    }
+  }
+  // Ancien : éliminé par le vote → tous les villageois perdent leurs pouvoirs
+  if (player.role === 'ancien' && cause === 'vote') {
+    state.ancienPouvoirsDesactives = true;
+    addLog('⚠ L\'Ancien a été voté — tous les rôles villageois perdent leurs pouvoirs définitivement !', 'special');
+  }
+}
+
+function checkLoupAmnesique() {
+  if (!state.loupAmnesiaqueId || state.loupAmnesiaqueRevealed) return;
+  const otherWolvesAlive = state.players.some(p =>
+    p.alive &&
+    p.id !== state.loupAmnesiaqueId &&
+    ['loup_garou','loup_noir','grand_mechant_loup','loup_blanc'].includes(p.role)
+  );
+  if (!otherWolvesAlive) {
+    state.loupAmnesiaqueRevealed = true;
+    const la = state.players.find(p => p.id === state.loupAmnesiaqueId);
+    addLog(`⚠ Le Loup Amnésique (${la?.name}) s'éveille ! Il jouera comme loup dès cette nuit.`, 'special');
+  }
+}
+
+// ── AFFICHAGE MORTS ───────────────────────────────────────────────
+function renderNightDeaths() {
+  const el = document.getElementById('night-deaths-list');
+  if (state.nightDeaths.length === 0) {
+    el.textContent = 'Personne n\'est mort cette nuit.';
+  } else {
+    el.innerHTML = state.nightDeaths.map(d => {
+      const role = getRoleById(d.player.role);
+      const isAmoureux = state.amoureux.includes(d.player.id);
+      const badgeClass = isAmoureux ? '' : campColor(role?.camp);
+      const badgeStyle = isAmoureux
+        ? 'style="background:rgba(255,105,135,0.15);color:#e05575;border:1px solid rgba(255,105,135,0.5);"'
+        : '';
+      const roleLabel = (role?.name || d.player.role) + (isAmoureux ? ' ❤' : '');
+      return `<div class="player-item" style="margin-bottom:6px;">
+        <span style="color:var(--wolf);">✝</span>
+        <span class="player-name">${d.player.name}</span>
+        <span class="player-role-badge ${badgeClass}" ${badgeStyle}>${roleLabel}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── TABLEAU DE BORD ───────────────────────────────────────────────
+function renderGamePlayers() {
+  const list = document.getElementById('game-players-list');
+  list.innerHTML = state.players.map(p => {
+    const role = getRoleById(p.role);
+    const effects = state.activeEffects[p.id] || [];
+    const isAmoureux = state.amoureux.includes(p.id);
+    const isInfecte  = state.infectes.includes(p.id);
+    const badgeClass = (isAmoureux || isInfecte) ? '' : campColor(role?.camp);
+    const badgeStyle = isAmoureux
+      ? 'style="background:rgba(255,105,135,0.15);color:#e05575;border:1px solid rgba(255,105,135,0.5);"'
+      : isInfecte
+        ? 'style="background:rgba(180,30,30,0.18);color:var(--wolf);border:1px solid rgba(180,30,30,0.5);"'
+        : '';
+    const roleLabel = isInfecte
+      ? `${role?.name || '?'} (infecté)`
+      : (role?.name || '?') + (isAmoureux ? ' ❤' : '');
+    return `
+      <div class="player-item" style="${!p.alive ? 'opacity:0.35;text-decoration:line-through;' : ''}">
+        <span class="player-name">${p.name}</span>
+        <span class="player-role-badge ${badgeClass}" ${badgeStyle}>${roleLabel}</span>
+        ${effects.includes('hypnotise') ? '<span style="font-size:0.7rem;color:var(--solo);">hypnotisé</span>' : ''}
+        ${p.role === 'parieur' ? `<span style="font-size:0.75rem;color:var(--gold);">${'🪙'.repeat(Math.min(state.parieurTokens[p.id]||0, 8))}${(state.parieurTokens[p.id]||0) > 8 ? ` ×${state.parieurTokens[p.id]}` : ''}</span>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function updateBoardCounts() {
+  const alive  = getAlivePlayers();
+  const wolves = alive.filter(p => isWolfPlayer(p));
+  document.getElementById('board-alive').textContent = alive.length;
+  document.getElementById('board-wolves').textContent = wolves.length;
+}
+
+// ── VICTOIRE ──────────────────────────────────────────────────────
+function isWolfPlayer(p) {
+  return ['loup_garou','loup_noir','grand_mechant_loup','loup_blanc','loup_amnesique'].includes(p.role)
+    || (p.role === 'chien_loup' && state.chienLoupCamp === 'loups')
+    || state.infectes.includes(p.id);
+}
+
+function checkVictory() {
+  const alive = getAlivePlayers();
+  if (alive.length === 0) return { winner: 'personne', message: 'Tout le monde est mort — match nul.' };
+
+  const wolves    = alive.filter(p => isWolfPlayer(p));
+  const nonWolves = alive.filter(p => !isWolfPlayer(p));
+
+  // Amoureux seuls
+  if (state.amoureux.length === 2) {
+    const a1 = state.players.find(p => p.id === state.amoureux[0]);
+    const a2 = state.players.find(p => p.id === state.amoureux[1]);
+    if (a1?.alive && a2?.alive && alive.length === 2) return { winner: 'amoureux', message: `Les amoureux ${a1.name} & ${a2.name} l'emportent !` };
+  }
+
+  // Joueur de Flûte
+  if (state.envoutes.length > 0 && alive.every(p => state.envoutes.includes(p.id))) {
+    return { winner: 'joueur_flute', message: 'Le Joueur de Flûte a envoûté tous les survivants !' };
+  }
+
+  // Parieur
+  const parieur = alive.find(p => p.role === 'parieur');
+  if (parieur && (state.parieurTokens[parieur.id] || 0) >= 8) {
+    return { winner: 'parieur', message: `${parieur.name} le Parieur atteint 8 jetons — victoire !` };
+  }
+
+  // Loups : gagnent uniquement quand il ne reste plus aucun non-loup
+  if (wolves.length > 0 && nonWolves.length === 0) return { winner: 'loups', message: 'Les Loups-Garous ont dévoré tout le village !' };
+
+  // Plus de loups
+  if (wolves.length === 0) return { winner: 'village', message: 'Le Village a éliminé tous les loups !' };
+
+  return null;
+}
+
+function showVictory(result) {
+  document.getElementById('game-day').style.display = 'none';
+  document.getElementById('game-night').style.display = 'none';
+  document.getElementById('game-victory').style.display = 'block';
+  document.getElementById('victory-message').textContent = result.message;
+  addLog(`🏆 Victoire : ${result.winner}`, 'victory');
+}
+
+// Navigation vers l'onglet Rôles — confirmation si partie en cours
+window.navToRoles = function() {
+  if (state.phase === 'game') {
+    document.getElementById('quit-game-modal').style.display = 'flex';
+  } else {
+    showSection('roles');
+    renderRoleGrid();
+    renderPresets();
+  }
+};
+
+window.closeQuitModal = function() {
+  document.getElementById('quit-game-modal').style.display = 'none';
+};
+
+window.confirmQuitGame = function() {
+  document.getElementById('quit-game-modal').style.display = 'none';
+  restartGame();
+};
+
+window.restartGame = function() {
+  // Conserver les joueurs (nom uniquement, état réinitialisé) et la composition
+  const savedPlayers = state.players.map(p => ({ id: p.id, name: p.name, role: null, alive: true }));
+  const savedRoles   = [...state.selectedRoles];
+  const savedPreset  = state.currentPreset;
+
+  Object.assign(state, {
+    phase: 'roles',
+    players: savedPlayers,
+    selectedRoles: savedRoles,
+    currentPreset: savedPreset,
+    assignedRoles: {},
+    revealedPlayers: new Set(),
+    nightNumber: 0, nightSteps: [], currentStep: 0,
+    nightActions: {}, selectedVoteTarget: null, nightDeaths: [], gameLog: [],
+    infectes: [],
+    faucheusePouvoirPerdu: false, faucheuseUsed: false,
+    amoureux: [], loupAmnesiaqueId: null, loupAmnesiaqueRevealed: false,
+    loupNoirUsed: false, ancienLoupUsed: false, grandMechantActif: true, hypnoUsages: 0,
+    envoutes: [], parieurTokens: {}, gardeCorpsLastProtected: null,
+    protecteurLastProtected: null, activeEffects: {},
+    sorciereLifeUsed: false, sorciereDeathUsed: false,
+    enfantSauvageModel: null, enfantSauvageConverted: false,
+    chienLoupCamp: null,
+    chasseurPending: false, chasseurCallback: null,
+    chevalierInfectedId: null,
+    ancienPouvoirsDesactives: false,
+    renardPouvoirPerdu: false,
+    loupAmnesiaqueEmergency: false,
+    loupAmnesiaqueCallback: null,
+  });
+  savedPlayers.forEach(p => { state.activeEffects[p.id] = []; state.parieurTokens[p.id] = 0; });
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.disabled = true);
+  document.getElementById('nav-setup').disabled  = false;
+  document.getElementById('nav-roles').disabled   = false;
+  showSection('roles');
+  renderRoleGrid();
+  renderPresets();
+};
+
+// ── LOG ───────────────────────────────────────────────────────────
+function renderLog() {
+  const el = document.getElementById('game-log');
+  el.innerHTML = state.gameLog.slice(0, 40).map(e => `
+    <div class="log-entry">
+      ${e.night > 0 ? `<span class="log-night">N${e.night}</span> ` : ''}${e.msg}
+    </div>
+  `).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+renderPlayers();
+document.getElementById('player-input').focus();
+</script>
+</body>
+</html>
